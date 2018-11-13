@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:clickable="true"
+    android:layout_marginLeft="8dp"
+    android:foreground="@drawable/item_background">
+    <TextView
+        android:id="@+id/tv_name"
+        style="@style/text_style_normal"
+        android:layout_centerVertical="true"
+        android:text="同步剧场"
+        android:textStyle="bold"
+        android:textColor="#ff000000"
+        android:textSize="15dp" />
+</RelativeLayout>
