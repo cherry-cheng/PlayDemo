@@ -13,18 +13,7 @@ public class CateInfoBean {
     List<String> style_list;
     List<String> year_list;
     List<String> place_list;
-    RecommendList recommendlist;
-    public class RecommendList {
-        List<SeriesBean.Episode> data;
-
-        public List<SeriesBean.Episode> getData() {
-            return data;
-        }
-
-        public void setData(List<SeriesBean.Episode> data) {
-            this.data = data;
-        }
-    }
+    List<SeriesBean.Episode> recommendlist;
 
     public List<String> getStyle_list() {
         return style_list;
@@ -38,7 +27,7 @@ public class CateInfoBean {
         return place_list;
     }
 
-    public RecommendList getRecommendlist() {
+    public List<SeriesBean.Episode> getRecommendlist() {
         return recommendlist;
     }
 
@@ -54,7 +43,7 @@ public class CateInfoBean {
         this.place_list = place_list;
     }
 
-    public void setRecommendlist(RecommendList recommendlist) {
+    public void setRecommendlist(List<SeriesBean.Episode> recommendlist) {
         this.recommendlist = recommendlist;
     }
 }

@@ -43,11 +43,9 @@ public class Recommend1BMItemViewBinder extends ItemViewBinder<RecommendBean.Mov
         holder.item_rl.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ToastUtils.showLongToast("点击了影片");
                 Intent intent = new Intent(context, PlayerActivity.class);
                 intent.putExtra("id", item.getId());
                 intent.putExtra("type", item.getType());
-                intent.putExtra("isLive", true);
                 context.startActivity(intent);
             }
         });

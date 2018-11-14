@@ -8,12 +8,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-
-import com.common.util.StringUtil;
 import com.common.util.ToastUtils;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.weizhan.superlook.R;
-import com.weizhan.superlook.model.bean.recommend1.AppRecommend1Show;
+import com.weizhan.superlook.model.bean.play.PlayInfoBean;
+import com.weizhan.superlook.model.event.PlayPost;
+
+import org.greenrobot.eventbus.EventBus;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -23,7 +24,7 @@ import me.drakeet.multitype.ItemViewBinder;
  * Created by Administrator on 2018/9/18.
  */
 
-public class GueLikeBodyItemViewBinder extends ItemViewBinder<AppRecommend1Show.Body, GueLikeBodyItemViewBinder.GueLikeBodyViewHolder> {
+public class GueLikeBodyItemViewBinder extends ItemViewBinder<PlayInfoBean.PlayRecommendBean, GueLikeBodyItemViewBinder.GueLikeBodyViewHolder> {
 
     @NonNull
     @Override
@@ -33,34 +34,19 @@ public class GueLikeBodyItemViewBinder extends ItemViewBinder<AppRecommend1Show.
     }
 
     @Override
-    protected void onBindViewHolder(@NonNull GueLikeBodyItemViewBinder.GueLikeBodyViewHolder holder, @NonNull AppRecommend1Show.Body item) {
+    protected void onBindViewHolder(@NonNull GueLikeBodyItemViewBinder.GueLikeBodyViewHolder holder, @NonNull final PlayInfoBean.PlayRecommendBean item) {
         Context context = holder.ivCover.getContext();
-/*        if (holder.getPosition() == 5) {
-            int width = ScreenUtil.getScreenWidth(context) / 3 - SystemUtil.dp2px(context, 8);
-            int height = context.getResources().getDimensionPixelSize(R.dimen.recommend1_cover_height1);
-            ImageUtil.load(holder.ivCover, item.getCover(), width, height);
-        } else {
-            int width = ScreenUtil.getScreenWidth(context) / 2 - SystemUtil.dp2px(context, 8);
-            int height = context.getResources().getDimensionPixelSize(R.dimen.recommend1_cover_height);
-            ImageUtil.load(holder.ivCover, item.getCover(), width, height);
-        }*/
-        holder.ivCover.setImageURI(item.getCover());
-        holder.tvAreaTitle.setText(item.getTitle());
-//        holder.tvPlay.setText(StringUtil.numberToWord(item.getPlay()));
-        String favourite = StringUtil.numberToWord(item.getFavourite());
-/*        if (!TextUtils.equals("0", favourite)) {
-            holder.tvDanmaku.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_promo_index_follow, 0, 0, 0);
-            holder.tvDanmaku.setText(favourite);
-        } else {
-            holder.tvDanmaku.setCompoundDrawablesWithIntrinsicBounds(R.drawable.bangumi_common_ic_video_danmakus, 0, 0, 0);
-            holder.tvDanmaku.setText(StringUtil.numberToWord(item.getDanmaku()));
-        }
-        holder.tvDanmaku.setCompoundDrawablePadding(SystemUtil.dp2px(holder.tvDanmaku.getContext(), 2));
-        holder.tvDanmaku.setCompoundDrawableTintList(ColorStateList.valueOf(0xffa5a5a5));*/
+        holder.ivCover.setImageURI(item.getV_img());
+        holder.tvAreaTitle.setText(item.getDescribes());
+        holder.tv_big_title.setText(item.getTitle());
+        holder.score.setText(item.getScore());
         holder.item_rl.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ToastUtils.showLongToast("点击了影片");
+                PlayPost playPost = new PlayPost();
+                playPost.setId(item.getId());
+                playPost.setType(item.getType());
+                EventBus.getDefault().post(playPost);
             }
         });
     }
@@ -73,6 +59,10 @@ public class GueLikeBodyItemViewBinder extends ItemViewBinder<AppRecommend1Show.
         TextView tvAreaTitle;
         @BindView(R.id.item_rl)
         RelativeLayout item_rl;
+        @BindView(R.id.tv_big_title)
+        TextView tv_big_title;
+        @BindView(R.id.score)
+        TextView score;
 
         public GueLikeBodyViewHolder(View itemView) {
             super(itemView);

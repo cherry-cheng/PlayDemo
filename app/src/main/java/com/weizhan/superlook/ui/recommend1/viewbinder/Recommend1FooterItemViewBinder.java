@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import com.common.util.ToastUtils;
 import com.weizhan.superlook.R;
+import com.weizhan.superlook.model.bean.region.CatePost;
 import com.weizhan.superlook.model.event.RangeRefresh;
 import com.weizhan.superlook.ui.region.series.SeriesRActivity;
 
@@ -45,7 +46,13 @@ public class Recommend1FooterItemViewBinder extends ItemViewBinder<Recommend1Foo
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(context, SeriesRActivity.class);
-                intent.putExtra("which", 2);
+                CatePost catePost = new CatePost();
+                catePost.setPlaces("0");
+                catePost.setStyles("0");
+                catePost.setType(item.getType());
+                catePost.setYears("0");
+                catePost.setHot_type("0");
+                intent.putExtra("catepost", catePost);
                 context.startActivity(intent);
             }
         });

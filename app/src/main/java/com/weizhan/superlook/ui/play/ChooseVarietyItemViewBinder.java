@@ -5,14 +5,17 @@ import android.support.annotation.NonNull;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
-
 import com.weizhan.superlook.R;
-import com.weizhan.superlook.model.bean.play.TestChooseBean;
+import com.weizhan.superlook.model.bean.play.TestSeriesBean;
+import com.weizhan.superlook.model.event.PartNumBean;
 import com.weizhan.superlook.widget.adapter.VarietyAdapter;
+
+import org.greenrobot.eventbus.EventBus;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -22,7 +25,7 @@ import me.drakeet.multitype.ItemViewBinder;
  * Created by Administrator on 2018/9/19.
  */
 
-public class ChooseVarietyItemViewBinder extends ItemViewBinder<TestChooseBean, ChooseVarietyItemViewBinder.VarietyItemViewHolder> {
+public class ChooseVarietyItemViewBinder extends ItemViewBinder<TestSeriesBean, ChooseVarietyItemViewBinder.VarietyItemViewHolder> {
 
     @NonNull
     @Override
@@ -32,7 +35,7 @@ public class ChooseVarietyItemViewBinder extends ItemViewBinder<TestChooseBean, 
     }
 
     @Override
-    protected void onBindViewHolder(@NonNull final ChooseVarietyItemViewBinder.VarietyItemViewHolder holder, @NonNull TestChooseBean item) {
+    protected void onBindViewHolder(@NonNull final ChooseVarietyItemViewBinder.VarietyItemViewHolder holder, @NonNull final TestSeriesBean item) {
         final Context context = holder.varietyRecyclerView.getContext();
         GridLayoutManager layoutManager1 = new GridLayoutManager(context, 1);
         layoutManager1.setOrientation(LinearLayoutManager.HORIZONTAL);
@@ -46,7 +49,12 @@ public class ChooseVarietyItemViewBinder extends ItemViewBinder<TestChooseBean, 
 
             @Override
             public void onSelected(int itemPosition, boolean isSelected) {
-                Toast.makeText(context, "selectedPosition:" + itemPosition  +" == "+ varietyAdapter.getSingleSelectedPosition(), Toast.LENGTH_SHORT).show();
+                if (isSelected) {
+                    PartNumBean partNumBean = new PartNumBean();
+                    partNumBean.setUrl(item.getList().get(itemPosition).getLinkurl());
+                    partNumBean.setTitle(item.getList().get(itemPosition).getContent());
+                    EventBus.getDefault().post(partNumBean);
+                }
             }
         });
     }

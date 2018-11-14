@@ -38,7 +38,7 @@ public class VarietyBodyItemViewBinder extends ItemViewBinder<SeriesBean.Episode
     }
 
     @Override
-    protected void onBindViewHolder(@NonNull VarietyBodyItemViewBinder.VarietyBodyViewHolder holder, @NonNull SeriesBean.Episode item) {
+    protected void onBindViewHolder(@NonNull VarietyBodyItemViewBinder.VarietyBodyViewHolder holder, @NonNull final SeriesBean.Episode item) {
         final Context context = holder.ivCover.getContext();
         holder.ivCover.setImageURI(item.getV_img());
         holder.tvAreaTitle.setText(item.getTitle());
@@ -48,10 +48,9 @@ public class VarietyBodyItemViewBinder extends ItemViewBinder<SeriesBean.Episode
         holder.item_rl.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ToastUtils.showLongToast("点击了综艺");
                 Intent intent = new Intent(context, Play2Activity.class);
-                intent.putExtra("url", Constants.PLAY_URL);
-                intent.putExtra("isLive", true);
+                intent.putExtra("id", item.getId());
+                intent.putExtra("type", item.getType());
                 context.startActivity(intent);
             }
         });

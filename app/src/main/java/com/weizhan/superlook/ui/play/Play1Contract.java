@@ -14,8 +14,10 @@ public interface Play1Contract {
         void onDataUpdated(Items items);
 
         void showLoadFailed();
+
+        void showPlay(String url, String title);
     }
     interface Presenter extends BasePresenter {
-
+        void loadPlayInfo(int id, int type);
     }
 }

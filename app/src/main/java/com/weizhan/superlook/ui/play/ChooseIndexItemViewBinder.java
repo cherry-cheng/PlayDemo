@@ -12,10 +12,11 @@ import android.widget.Toast;
 
 import com.weizhan.superlook.R;
 import com.weizhan.superlook.model.bean.play.TestSeriesBean;
+import com.weizhan.superlook.model.event.PartNumBean;
+import com.weizhan.superlook.model.event.PlayPost;
 import com.weizhan.superlook.widget.adapter.SeriesAdapter;
-import com.weizhan.superlook.widget.adapter.VarietyAdapter;
 
-import java.util.List;
+import org.greenrobot.eventbus.EventBus;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -35,7 +36,7 @@ public class ChooseIndexItemViewBinder extends ItemViewBinder<TestSeriesBean, Ch
     }
 
     @Override
-    protected void onBindViewHolder(@NonNull final ChooseIndexItemViewBinder.ChooseIndexViewHolder holder, @NonNull TestSeriesBean item) {
+    protected void onBindViewHolder(@NonNull final ChooseIndexItemViewBinder.ChooseIndexViewHolder holder, @NonNull final TestSeriesBean item) {
         final Context context = holder.seriesRecyclerView.getContext();
         GridLayoutManager layoutManager1 = new GridLayoutManager(context, 1);
         layoutManager1.setOrientation(LinearLayoutManager.HORIZONTAL);
@@ -46,10 +47,14 @@ public class ChooseIndexItemViewBinder extends ItemViewBinder<TestSeriesBean, Ch
 
         //监听单选
         seriesAdapter.setOnItemSingleSelectListener(new SeriesAdapter.OnItemSingleSelectListener() {
-
             @Override
             public void onSelected(int itemPosition, boolean isSelected) {
-                Toast.makeText(context, "selectedPosition:" + itemPosition  +" == "+ seriesAdapter.getSingleSelectedPosition(), Toast.LENGTH_SHORT).show();
+                if (isSelected) {
+                    PartNumBean partNumBean = new PartNumBean();
+                    partNumBean.setUrl(item.getList().get(itemPosition).getLinkurl());
+                    partNumBean.setTitle(item.getList().get(itemPosition).getContent());
+                    EventBus.getDefault().post(partNumBean);
+                }
             }
         });
     }

@@ -44,9 +44,11 @@ public class RegionBodyItemViewBinder extends ItemViewBinder<RegionBean.SmallCat
             public void onClick(View view) {
                 Intent intent = new Intent(context, SeriesRActivity.class);
                 CatePost catePost = new CatePost();
-                catePost.setPlace(item.getPlace());
-                catePost.setStyle_name(item.getStyle_name());
+                catePost.setPlaces(item.getPlace());
+                catePost.setStyles(item.getStyle_name());
                 catePost.setType(item.getType());
+                catePost.setYears("0");
+                catePost.setHot_type("0");
                 intent.putExtra("catepost", catePost);
                 context.startActivity(intent);
             }

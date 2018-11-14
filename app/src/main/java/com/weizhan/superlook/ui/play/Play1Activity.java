@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -18,11 +19,18 @@ import com.dueeeke.videoplayer.player.IjkVideoView;
 import com.dueeeke.videoplayer.player.PlayerConfig;
 import com.weizhan.superlook.App;
 import com.weizhan.superlook.R;
+import com.weizhan.superlook.model.bean.play.PlayInfoBean;
 import com.weizhan.superlook.model.bean.play.TestBean;
 import com.weizhan.superlook.model.bean.play.TestSeriesBean;
 import com.weizhan.superlook.model.bean.recommend1.AppRecommend1Show;
+import com.weizhan.superlook.model.event.PartNumBean;
+import com.weizhan.superlook.model.event.PlayPost;
 import com.weizhan.superlook.widget.adapter.CommonAdapter;
 import com.weizhan.superlook.widget.adapter.SeriesAdapter;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -89,7 +97,7 @@ public class Play1Activity extends BaseActivity implements IBaseMvpActivity<Play
 
     @Override
     public void initViewAndEvent() {
-        ijkVideoView = findViewById(R.id.player);
+/*        ijkVideoView = findViewById(R.id.player);
 
         Intent intent = getIntent();
 
@@ -138,18 +146,72 @@ public class Play1Activity extends BaseActivity implements IBaseMvpActivity<Play
                 }
             }
         });
-//        mAdapter.register(AppRecommend1Show.Partition.class, playTitleItemViewBinder);
         mAdapter.register(TestBean.class, new GuessTitleViewBinder());
         mAdapter.register(AppRecommend1Show.Body.class, new GueLikeBodyItemViewBinder());
         mAdapter.register(TestSeriesBean.class, new ChooseIndexItemViewBinder());
         mAdapter.setScrollSaveStrategyEnabled(true);
+        guessLike_recyclerView.setAdapter(mAdapter);*/
+
+
+
+        ijkVideoView = findViewById(R.id.player);
+        Intent intent = getIntent();
+        int id = intent.getIntExtra("id", 0);
+        int type = intent.getIntExtra("type", 0);
+        Log.e("PlayPresenter", "id = " + id + " type = " + type);
+        GridLayoutManager layoutManager = new GridLayoutManager(this, SPAN_COUNT);
+        GridLayoutManager.SpanSizeLookup spanSizeLookup = new GridLayoutManager.SpanSizeLookup() {
+            @Override
+            public int getSpanSize(int position) {
+                Object item = mAdapter.getItems().get(position);
+                return item instanceof PlayInfoBean.PlayRecommendBean ? 1 : SPAN_COUNT;
+            }
+        };
+        layoutManager.setSpanSizeLookup(spanSizeLookup);
+        guessLike_recyclerView.setLayoutManager(layoutManager);
+        guessLike_recyclerView.addItemDecoration(new GuessLike1ItemDecoration());
+        guessLike_recyclerView.setBackgroundColor(ContextCompat.getColor(this, R.color.white));
+        mAdapter = new CommonAdapter(0, 99);
+        PlayTitleItemViewBinder playTitleItemViewBinder = new PlayTitleItemViewBinder();
+        playTitleItemViewBinder.setClickListenr(new PlayTitleItemViewBinder.tvClick() {
+            @Override
+            public void ontvClick(ImageView imageView, LinearLayout linearLayout) {
+                if (imageView.isSelected()) {
+                    imageView.setSelected(false);
+                    linearLayout.setVisibility(View.GONE);
+                } else {
+                    imageView.setSelected(true);
+                    linearLayout.setVisibility(View.VISIBLE);
+                    guessLike_recyclerView.scrollToPosition(0);
+                }
+            }
+        });
+        mAdapter.register(PlayInfoBean.PlayBean.class, playTitleItemViewBinder);
+        mAdapter.register(PlayInfoBean.PlayRecommendBean.class, new GueLikeBodyItemViewBinder());
+        mAdapter.register(TestBean.class, new GuessTitleViewBinder());
+        mAdapter.register(TestSeriesBean.class, new ChooseIndexItemViewBinder());
+        mAdapter.setScrollSaveStrategyEnabled(true);
         guessLike_recyclerView.setAdapter(mAdapter);
+
+        mPresenter.loadPlayInfo(id, type);
 
     }
 
     @Override
     public Play1Presenter getPresenter() {
         return mPresenter;
+    }
+
+    @Override
+    public void onStop() {
+        EventBus.getDefault().unregister(this);
+        super.onStop();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
     }
 
     @Override
@@ -162,4 +224,39 @@ public class Play1Activity extends BaseActivity implements IBaseMvpActivity<Play
     public void showLoadFailed() {
         mAdapter.showLoadFailed();
     }
+
+    @Override
+    public void showPlay(String url, String title) {
+        //播放影片
+        ijkVideoView.release();
+        StandardVideoController controller = new StandardVideoController(this);
+        ijkVideoView.setPlayerConfig(new PlayerConfig.Builder()
+                .autoRotate()//自动旋转屏幕
+//                    .enableCache()//启用边播边存
+//                    .enableMediaCodec()//启动硬解码
+//                    .usingSurfaceView()//使用SurfaceView
+//                    .setCustomMediaPlayer(new ExoMediaPlayer(this))
+//                    .setCustomMediaPlayer(new AndroidMediaPlayer(this))
+                .build());
+//            ijkVideoView.setScreenScale(IjkVideoView.SCREEN_SCALE_CENTER_CROP);
+        ijkVideoView.setUrl(url);
+        ijkVideoView.setTitle(title);
+        ijkVideoView.setVideoController(controller);
+        ijkVideoView.start();
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onPlayRefresh(PlayPost playPost) {
+        if (playPost != null) {
+            mPresenter.loadPlayInfo(playPost.getId(), playPost.getType());
+        }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onPlayPartNum(PartNumBean partNumBean) {
+        if (partNumBean != null) {
+            showPlay(partNumBean.getUrl(), partNumBean.getTitle());
+        }
+    }
+
 }

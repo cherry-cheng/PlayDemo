@@ -2,21 +2,14 @@ package com.weizhan.superlook.ui.region.series;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
-
 import com.weizhan.superlook.R;
-import com.weizhan.superlook.model.bean.play.TestSeriesBean;
 import com.weizhan.superlook.model.bean.region.RecyclerTitleBean;
-import com.weizhan.superlook.ui.play.ChooseIndexItemViewBinder;
-import com.weizhan.superlook.ui.play.SeriesItemDecoration;
 import com.weizhan.superlook.widget.adapter.EasyAdapter;
-import com.weizhan.superlook.widget.adapter.SeriesAdapter;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -49,7 +42,7 @@ public class TitleRecyItemViewBinder extends ItemViewBinder<RecyclerTitleBean, T
     }
 
     @Override
-    protected void onBindViewHolder(@NonNull final TitleRecyItemViewBinder.TitleRecyViewHolder holder, @NonNull RecyclerTitleBean item) {
+    protected void onBindViewHolder(@NonNull final TitleRecyItemViewBinder.TitleRecyViewHolder holder, @NonNull final RecyclerTitleBean item) {
         final Context context = holder.recyclerView1.getContext();
         easyAdapter1 = new EasyAdapter(item.getRecDataList1(), context);
         easyAdapter2 = new EasyAdapter(item.getRecDataList2(), context);
@@ -63,8 +56,8 @@ public class TitleRecyItemViewBinder extends ItemViewBinder<RecyclerTitleBean, T
         holder.recyclerView2.setLayoutManager(linearLayoutManager2);
         holder.recyclerView1.setAdapter(easyAdapter1);
         holder.recyclerView2.setAdapter(easyAdapter2);
-        easyAdapter1.setSelected(position1);
-        easyAdapter2.setSelected(position2);
+        easyAdapter1.setSelected(item.getPosition1());
+        easyAdapter2.setSelected(item.getPosition2());
         if (item.getType() != 1) {
             holder.recyclerView3.setVisibility(View.GONE);
         } else {
@@ -74,14 +67,14 @@ public class TitleRecyItemViewBinder extends ItemViewBinder<RecyclerTitleBean, T
             linearLayoutManager3.setOrientation(LinearLayoutManager.HORIZONTAL); //把列表设置成水平滚动
             holder.recyclerView3.setLayoutManager(linearLayoutManager3);
             holder.recyclerView3.setAdapter(easyAdapter3);
-            easyAdapter3.setSelected(position3);
+            easyAdapter3.setSelected(item.getPosition3());
             //监听单选
             easyAdapter3.setOnItemSingleSelectListener(new EasyAdapter.OnItemSingleSelectListener() {
 
                 @Override
                 public void onSelected(int itemPosition, boolean isSelected) {
 //                Toast.makeText(context, "selectedPosition:" + itemPosition  +" == "+ easyAdapter3.getSingleSelectedPosition(), Toast.LENGTH_SHORT).show();
-                    titleChooseListner.onRecycler3Choose(itemPosition, isSelected);
+                    titleChooseListner.onRecycler3Choose(itemPosition, isSelected, item.getRecDataList3().get(itemPosition));
                     position3 = itemPosition;
                 }
             });
@@ -104,7 +97,7 @@ public class TitleRecyItemViewBinder extends ItemViewBinder<RecyclerTitleBean, T
             @Override
             public void onSelected(int itemPosition, boolean isSelected) {
 //                Toast.makeText(context, "selectedPosition:" + itemPosition  +" == "+ easyAdapter2.getSingleSelectedPosition(), Toast.LENGTH_SHORT).show();
-                titleChooseListner.onRecycler2Choose(itemPosition, isSelected);
+                titleChooseListner.onRecycler2Choose(itemPosition, isSelected, item.getRecDataList2().get(itemPosition));
                 position2 = itemPosition;
             }
         });
@@ -125,7 +118,12 @@ public class TitleRecyItemViewBinder extends ItemViewBinder<RecyclerTitleBean, T
 
     public interface TitleChooseListner {
         void onRecycler1Choose(int itemPosition, boolean isSelected);
-        void onRecycler2Choose(int itemPosition, boolean isSelected);
-        void onRecycler3Choose(int itemPosition, boolean isSelected);
+        void onRecycler2Choose(int itemPosition, boolean isSelected, String place);
+        void onRecycler3Choose(int itemPosition, boolean isSelected, String style);
+    }
+
+    public void setPosition3(int position3) {
+        this.position3 = position3;
+        easyAdapter3.notifyDataSetChanged();
     }
 }

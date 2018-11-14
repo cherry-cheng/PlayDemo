@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.weizhan.superlook.R;
+import com.weizhan.superlook.model.bean.play.PlayMoreInfoBean;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,20 +23,20 @@ public class SeriesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     private SeriesAdapter.OnItemClickListener onItemClickListener;
     private SeriesAdapter.OnItemSingleSelectListener onItemSingleSelectListener;
 
-    private List<String> list = new ArrayList<String>();
+    private List<PlayMoreInfoBean.PartNum> list = new ArrayList<PlayMoreInfoBean.PartNum>();
     private Context mContext;
     public void setOnItemClickListener(SeriesAdapter.OnItemClickListener onItemClickListener) {
         this.onItemClickListener = onItemClickListener;
     }
 
-    public void setData(List<String> newList) {
+    public void setData(List<PlayMoreInfoBean.PartNum> newList) {
         if (newList != null && newList.size() > 0)
             this.list.clear();
         this.list = newList;
         notifyDataSetChanged();
     }
 
-    public SeriesAdapter(List<String> list, Context context) {
+    public SeriesAdapter(List<PlayMoreInfoBean.PartNum> list, Context context) {
         this.list = list;
         this.mContext = context;
     }
@@ -56,7 +57,7 @@ public class SeriesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
 
         ((SeriesAdapter.MyViewHolder)holder).textView.setTag(position);//绑定
-        ((SeriesAdapter.MyViewHolder)holder).textView.setText(list.get(position));
+        ((SeriesAdapter.MyViewHolder)holder).textView.setText(list.get(position).getNum() + "");
         holder.itemView.setTag(position);
         holder.itemView.setOnClickListener(this);
         if (singleSelected == position) {

@@ -7,13 +7,13 @@ import java.util.List;
  */
 
 public class TestSeriesBean {
-    List<String> list;
+    List<PlayMoreInfoBean.PartNum> list;
 
-    public List<String> getList() {
+    public List<PlayMoreInfoBean.PartNum> getList() {
         return list;
     }
 
-    public void setList(List<String> list) {
+    public void setList(List<PlayMoreInfoBean.PartNum> list) {
         this.list = list;
     }
 }

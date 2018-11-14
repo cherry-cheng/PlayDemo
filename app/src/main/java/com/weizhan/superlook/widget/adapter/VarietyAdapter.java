@@ -11,10 +11,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.weizhan.superlook.R;
-import com.weizhan.superlook.model.bean.play.TestChooseBean;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.weizhan.superlook.model.bean.play.TestSeriesBean;
 
 /**
  * Created by Administrator on 2018/9/18.
@@ -24,19 +21,19 @@ public class VarietyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     private VarietyAdapter.OnItemClickListener onItemClickListener;
     private VarietyAdapter.OnItemSingleSelectListener onItemSingleSelectListener;
 
-    private TestChooseBean testChooseBean = new TestChooseBean();
+    private TestSeriesBean testChooseBean = new TestSeriesBean();
     private Context mContext;
     public void setOnItemClickListener(VarietyAdapter.OnItemClickListener onItemClickListener) {
         this.onItemClickListener = onItemClickListener;
     }
 
-    public void setData(TestChooseBean newList) {
-        if (newList != null && newList.getItems().size() > 0)
+    public void setData(TestSeriesBean newList) {
+        if (newList != null && newList.getList().size() > 0)
         this.testChooseBean = newList;
         notifyDataSetChanged();
     }
 
-    public VarietyAdapter(TestChooseBean list, Context context) {
+    public VarietyAdapter(TestSeriesBean list, Context context) {
         this.testChooseBean = list;
         this.mContext = context;
     }
@@ -57,14 +54,14 @@ public class VarietyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
 
         ((VarietyAdapter.MyViewHolder)holder).textView.setTag(position);//绑定
-        ((VarietyAdapter.MyViewHolder)holder).textView.setText(testChooseBean.getItems().get(position).getDes());
+        ((VarietyAdapter.MyViewHolder)holder).textView.setText(testChooseBean.getList().get(position).getContent());
+        ((MyViewHolder)holder).time.setText(testChooseBean.getList().get(position).getTimes());
         ((MyViewHolder) holder).ll_item.setTag(position);
         ((MyViewHolder) holder).ll_item.setOnClickListener(this);
         if (singleSelected == position) {
             ((MyViewHolder) holder).ll_item.setSelected(true);
             ((VarietyAdapter.MyViewHolder)holder).textView.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
             ((VarietyAdapter.MyViewHolder)holder).textView.setTextColor(Color.parseColor("#ffffff"));
-
             ((MyViewHolder)holder).time.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
             ((MyViewHolder)holder).time.setTextColor(Color.parseColor("#ffffff"));
             ((MyViewHolder)holder).ll_item.setBackgroundResource(R.drawable.bg_hotsearch);
@@ -80,7 +77,7 @@ public class VarietyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     @Override
     public int getItemCount() {
-        return testChooseBean.getItems().size();
+        return testChooseBean.getList().size();
     }
 
     @Override

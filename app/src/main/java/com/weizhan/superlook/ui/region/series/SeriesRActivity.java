@@ -2,6 +2,7 @@ package com.weizhan.superlook.ui.region.series;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.widget.TextView;
 
 import com.common.base.BaseActivity;
@@ -37,6 +38,8 @@ public class SeriesRActivity extends BaseActivity implements IBaseMvpActivity<Se
     private CommonAdapter commonAdapter;
     private int SPAN_COUNT = 2;
 
+    TitleRecyItemViewBinder titleRecyItemViewBinder = new TitleRecyItemViewBinder();
+
     @Override
     public int getLayoutId() {
         return R.layout.activity_seriesr;
@@ -54,7 +57,7 @@ public class SeriesRActivity extends BaseActivity implements IBaseMvpActivity<Se
 
     @Override
     public void initViewAndEvent() {
-        CatePost catePost = (CatePost) getIntent().getSerializableExtra("catepost");
+        final CatePost catePost = (CatePost) getIntent().getSerializableExtra("catepost");
         if (catePost.getType() == 1) {
             SPAN_COUNT = 3;
         } else {
@@ -77,21 +80,37 @@ public class SeriesRActivity extends BaseActivity implements IBaseMvpActivity<Se
         }
         recyclerViewContent.setBackgroundColor(ContextCompat.getColor(this, R.color.white));
         commonAdapter = new CommonAdapter(0, 1);
-        TitleRecyItemViewBinder titleRecyItemViewBinder = new TitleRecyItemViewBinder();
         titleRecyItemViewBinder.setTitleChooseListner(new TitleRecyItemViewBinder.TitleChooseListner() {
             @Override
             public void onRecycler1Choose(int itemPosition, boolean isSelected) {
-                ToastUtils.showLongToast("点击了" + itemPosition + isSelected);
+                if (true) {
+                    catePost.setHot_type(itemPosition + "");
+                    mPresenter.loadDataWithParas(catePost);
+                }
             }
 
             @Override
-            public void onRecycler2Choose(int itemPosition, boolean isSelected) {
-                ToastUtils.showLongToast("点击了" + itemPosition + isSelected);
+            public void onRecycler2Choose(int itemPosition, boolean isSelected, String place) {
+                if (true) {
+                    if (place.equals("全部地区")) {
+                        catePost.setPlaces("0");
+                    } else {
+                        catePost.setPlaces(place);
+                    }
+                    mPresenter.loadDataWithParas(catePost);
+                }
             }
 
             @Override
-            public void onRecycler3Choose(int itemPosition, boolean isSelected) {
-                ToastUtils.showLongToast("点击了" + itemPosition + isSelected);
+            public void onRecycler3Choose(int itemPosition, boolean isSelected, String style) {
+                if (true) {
+                    if (style.equals("全部类型")) {
+                        catePost.setStyles("0");
+                    } else {
+                        catePost.setStyles(style);
+                    }
+                    mPresenter.loadDataWithParas(catePost);
+                }
             }
         });
         commonAdapter.register(RecyclerTitleBean.class, titleRecyItemViewBinder);
@@ -138,20 +157,21 @@ public class SeriesRActivity extends BaseActivity implements IBaseMvpActivity<Se
         commonAdapter.notifyDataSetChanged();
     }
 
-/*    @Override
-    public void onDataResponse(int type) {
-        if (type == 1) {
-            easyAdapter3.setData(list2);
-        }
-    }*/
-
     @Override
     public void showLoadFailed() {
         commonAdapter.showLoadFailed();
     }
 
     @Override
-    public void loadNow(int type, RecyclerTitleBean recyclerTitleBean) {
-
+    public void onDataRangeUpdated(Items newItems, Items oldItems, int startPosition) {
+        commonAdapter.setItems(newItems);
+        if (newItems.size() >= oldItems.size()) {
+            //填入新增的
+            commonAdapter.notifyItemRangeChanged(1, newItems.size()-1, "abc");
+        } else {
+            //删除多余的
+            commonAdapter.notifyItemRangeRemoved(newItems.size(), oldItems.size()-newItems.size());
+            commonAdapter.notifyItemRangeChanged(newItems.size(), oldItems.size() - newItems.size());
+        }
     }
 }

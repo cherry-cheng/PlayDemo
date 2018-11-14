@@ -14,6 +14,8 @@ import com.facebook.drawee.view.SimpleDraweeView;
 import com.weizhan.superlook.R;
 import com.weizhan.superlook.model.bean.recommend1.RecommendBean;
 import com.weizhan.superlook.ui.play.Play1Activity;
+import com.weizhan.superlook.ui.play.Play2Activity;
+import com.weizhan.superlook.ui.play.PlayerActivity;
 import com.weizhan.superlook.util.Constants;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -47,11 +49,17 @@ public class Recommend1BodyItemViewBinder extends ItemViewBinder<RecommendBean.C
         holder.item_rl.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ToastUtils.showLongToast("点击了电视剧");
-                Intent intent = new Intent(context, Play1Activity.class);
-                intent.putExtra("url", item.getLinkurl());
-                intent.putExtra("isLive", true);
-                context.startActivity(intent);
+                if (item.getType() == 2) {
+                    Intent intent = new Intent(context, Play1Activity.class);
+                    intent.putExtra("id", item.getId());
+                    intent.putExtra("type", item.getType());
+                    context.startActivity(intent);
+                } else {
+                    Intent intent = new Intent(context, Play2Activity.class);
+                    intent.putExtra("id", item.getId());
+                    intent.putExtra("type", item.getType());
+                    context.startActivity(intent);
+                }
             }
         });
     }

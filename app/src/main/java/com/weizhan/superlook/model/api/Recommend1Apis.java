@@ -4,6 +4,7 @@ import com.weizhan.superlook.model.bean.DataListResponse;
 import com.weizhan.superlook.model.bean.TTDataResponse;
 
 import com.weizhan.superlook.model.bean.play.PlayInfoBean;
+import com.weizhan.superlook.model.bean.play.PlayMoreInfoBean;
 import com.weizhan.superlook.model.bean.recommend1.AppRecommend1Show;
 import com.weizhan.superlook.model.bean.recommend1.ChangeBean;
 import com.weizhan.superlook.model.bean.recommend1.RecommendBean;
@@ -35,10 +36,15 @@ public interface Recommend1Apis {
     @GET("/api/home")
     Observable<TTDataResponse<RecommendBean>> getRecommend(@Query("navid") String navid);
 
+    //电影
     @GET("/api/movieinfo")
     Observable<TTDataResponse<PlayInfoBean>> getPlayInfo(@Query("id") int id,
                                                          @Query("type") int type);
 
+    //电视剧。综艺
+    @GET("/api/movieinfo")
+    Observable<TTDataResponse<PlayMoreInfoBean>> getPlayMoreInfo(@Query("id") int id,
+                                                             @Query("type") int type);
     @GET("/api/homechange")
     Observable<TTDataResponse<ChangeBean>> getChangeInfo(@Query("id") int id,
                                                          @Query("type") int type,

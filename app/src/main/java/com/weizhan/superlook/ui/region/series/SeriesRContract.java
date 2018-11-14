@@ -18,14 +18,13 @@ public interface SeriesRContract {
 
         void showLoadFailed();
 
-//        void onDataResponse(int type);
-        void loadNow(int type, RecyclerTitleBean recyclerTitleBean);
+        void onDataRangeUpdated(Items newItems, Items oldItems, int startPosition);
     }
 
     interface Presenter extends BasePresenter {
 
         void loadDataWithParas(CatePost catePost);
-
+        void loadRangeDataWithParas(CatePost catePost);
     }
 
 }

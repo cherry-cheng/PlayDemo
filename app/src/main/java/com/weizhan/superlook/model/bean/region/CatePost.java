@@ -7,31 +7,50 @@ import java.io.Serializable;
  */
 
 public class CatePost implements Serializable {
-    String place;
-    String style_name;
-    int type;
+    String places;  //0全部
+    String styles;  //0全部
+    int type;  //1 电影   2  电视剧   3  综艺   0 全部
+    String years;  //0 全部
+    String hot_type;  //1新上线 2 热播 3 综艺  0全部
 
-    public String getPlace() {
-        return place;
+
+    public String getPlaces() {
+        return places;
     }
 
-    public String getStyle_name() {
-        return style_name;
+    public String getStyles() {
+        return styles;
     }
 
     public int getType() {
         return type;
     }
 
-    public void setPlace(String place) {
-        this.place = place;
+    public String getYears() {
+        return years;
     }
 
-    public void setStyle_name(String style_name) {
-        this.style_name = style_name;
+    public String getHot_type() {
+        return hot_type;
+    }
+
+    public void setPlaces(String places) {
+        this.places = places;
+    }
+
+    public void setStyles(String styles) {
+        this.styles = styles;
     }
 
     public void setType(int type) {
         this.type = type;
+    }
+
+    public void setYears(String years) {
+        this.years = years;
+    }
+
+    public void setHot_type(String hot_type) {
+        this.hot_type = hot_type;
     }
 }

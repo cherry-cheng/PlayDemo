@@ -3,19 +3,15 @@ package com.weizhan.superlook.ui.play;
 import android.util.Log;
 
 import com.common.base.AbsBasePresenter;
-import com.common.util.DateUtil;
-import com.weizhan.superlook.model.api.ApiHelper;
 import com.weizhan.superlook.model.api.Recommend1Apis;
-import com.weizhan.superlook.model.bean.DataListResponse;
+import com.weizhan.superlook.model.bean.TTDataResponse;
+import com.weizhan.superlook.model.bean.play.PlayInfoBean;
+import com.weizhan.superlook.model.bean.play.PlayMoreInfoBean;
 import com.weizhan.superlook.model.bean.play.TestBean;
 import com.weizhan.superlook.model.bean.play.TestSeriesBean;
-import com.weizhan.superlook.model.bean.recommend1.AppRecommend1Show;
 
-import java.util.Arrays;
 import java.util.List;
-
 import javax.inject.Inject;
-
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.annotations.NonNull;
@@ -34,26 +30,56 @@ public class Play1Presenter extends AbsBasePresenter<Play1Contract.View> impleme
 
     private Recommend1Apis mRecommend1Apis;
 
+    private String playUrl = "";
+    private String playTitle="";
+
     @Inject
     public Play1Presenter(Recommend1Apis regionApis) {
         mRecommend1Apis = regionApis;
     }
 
+
     @Override
-    public void loadData() {
+    public void releaseData() {
+
+    }
+
+    private Items playInfoShow2Items(PlayMoreInfoBean playMoreInfoBean) {
+        Log.e("PlayPresenter", "playInfoBean = " + playMoreInfoBean.getInfo().getActors());
         Items items = new Items();
-        mView.onDataUpdated(items);
-        mRecommend1Apis.getRecommend1Show(
-                ApiHelper.APP_KEY,
-                ApiHelper.BUILD,
-                ApiHelper.MOBI_APP,
-                ApiHelper.PLATFORM,
-                DateUtil.getSystemTime())
-                .subscribeOn(Schedulers.newThread())
-                .map(new Function<DataListResponse<AppRecommend1Show>, Items>() {
+        List<PlayInfoBean.PlayRecommendBean> playRecommendBeans = playMoreInfoBean.getRecommendslist();
+        PlayInfoBean.PlayBean playBean = playMoreInfoBean.getInfo();
+        // 播放详情下面的信息需要添加，待续...........
+        items.add(playBean);
+
+        //选集
+        TestBean testBean1 = new TestBean();
+        testBean1.setTitle("选集");
+        items.add(testBean1);
+
+        TestSeriesBean testSeriesBean = new TestSeriesBean();
+        testSeriesBean.setList(playMoreInfoBean.getNum());
+        items.add(testSeriesBean);
+        playUrl = playMoreInfoBean.getNum().get(0).getLinkurl();
+        playTitle = playMoreInfoBean.getInfo().getTitle();
+        TestBean testBean = new TestBean();
+        testBean.setTitle("猜你喜欢");
+        items.add(testBean);
+        for (PlayInfoBean.PlayRecommendBean playRecommendBean: playRecommendBeans) {
+            items.add(playRecommendBean);
+        }
+        return items;
+    }
+
+    @Override
+    public void loadPlayInfo(int id, int type) {
+        mRecommend1Apis.getPlayMoreInfo(id, type)
+                .subscribeOn(Schedulers.io())
+                .map(new Function<TTDataResponse<PlayMoreInfoBean>, Items>() {
                     @Override
-                    public Items apply(@NonNull DataListResponse<AppRecommend1Show> regionShow) throws Exception {
-                        return regionShow2Items(regionShow);
+                    public Items apply(@NonNull TTDataResponse<PlayMoreInfoBean> palyInfoBean) throws Exception {
+                        Log.e(TAG, "playmoreninfo = " + palyInfoBean.getMsg());
+                        return playInfoShow2Items(palyInfoBean.getBody());
                     }
                 })
                 .observeOn(AndroidSchedulers.mainThread())
@@ -65,6 +91,9 @@ public class Play1Presenter extends AbsBasePresenter<Play1Contract.View> impleme
 
                     @Override
                     public void onNext(@NonNull Items items) {
+                        //让view播放影片
+                        Log.e("cyh444", "playUrl = " + playUrl);
+                        mView.showPlay(playUrl, playTitle);
                         mView.onDataUpdated(items);
                     }
 
@@ -78,41 +107,7 @@ public class Play1Presenter extends AbsBasePresenter<Play1Contract.View> impleme
                     @Override
                     public void onComplete() {
                         Log.d(TAG, "onComplete");
-
                     }
                 });
-    }
-
-    private Items regionShow2Items(DataListResponse<AppRecommend1Show> regionShow) {
-        Items items = new Items();
-        List<AppRecommend1Show> regionShowList = regionShow.getData();
-        AppRecommend1Show.Partition p = new AppRecommend1Show().new Partition();
-        items.add(p);
-        TestBean testBean1 = new TestBean();
-        testBean1.setTitle("选集");
-        items.add(testBean1);
-
-        TestSeriesBean testSeriesBean = new TestSeriesBean();
-        testSeriesBean.setList(Arrays.asList("1", "2", "3", "4", "5", "6", "7", "8", "9"));
-        items.add(testSeriesBean);
-
-        TestBean testBean = new TestBean();
-        testBean.setTitle("踩你喜欢");
-        items.add(testBean);
-        for (AppRecommend1Show appRecommend1Show : regionShowList) {
-            //body
-            List<AppRecommend1Show.Body> bodyList = appRecommend1Show.getBody();
-            for (AppRecommend1Show.Body b : bodyList) {
-                items.add(b);
-            }
-            break;
-        }
-        return items;
-    }
-
-
-    @Override
-    public void releaseData() {
-
     }
 }
