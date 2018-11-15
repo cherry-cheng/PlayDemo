@@ -8,6 +8,8 @@ import com.common.base.BaseMvpFragment;
 import com.weizhan.superlook.App;
 import com.weizhan.superlook.R;
 import com.weizhan.superlook.model.bean.recommend1.AppRecommend1Show;
+import com.weizhan.superlook.model.bean.series.SeriesBean;
+import com.weizhan.superlook.ui.search.result.all.AllSearchBodyItemViewBinder;
 import com.weizhan.superlook.widget.adapter.CommonAdapter;
 
 import butterknife.BindView;
@@ -44,7 +46,7 @@ public class SeriesSFragment extends BaseMvpFragment<SeriesSPresenter> implement
         mRecyclerView.addItemDecoration(new SeriesSIndexItemDecoration());
         mRecyclerView.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.white));
         mAdapter = new CommonAdapter(2, 99);
-        mAdapter.register(AppRecommend1Show.Body.class, new SeriesSBodyItemViewBinder());
+        mAdapter.register(SeriesBean.EpisodeSearch.class, new AllSearchBodyItemViewBinder());
         mAdapter.setScrollSaveStrategyEnabled(true);
         mRecyclerView.setAdapter(mAdapter);
     }

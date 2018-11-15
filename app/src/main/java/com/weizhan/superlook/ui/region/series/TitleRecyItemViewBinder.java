@@ -46,8 +46,6 @@ public class TitleRecyItemViewBinder extends ItemViewBinder<RecyclerTitleBean, T
         final Context context = holder.recyclerView1.getContext();
         easyAdapter1 = new EasyAdapter(item.getRecDataList1(), context);
         easyAdapter2 = new EasyAdapter(item.getRecDataList2(), context);
-        easyAdapter1 = new EasyAdapter(item.getRecDataList1(), context);
-        easyAdapter2 = new EasyAdapter(item.getRecDataList2(), context);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(context);
         linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL); //把列表设置成水平滚动
         LinearLayoutManager linearLayoutManager2 = new LinearLayoutManager(context);
@@ -61,7 +59,6 @@ public class TitleRecyItemViewBinder extends ItemViewBinder<RecyclerTitleBean, T
         if (item.getType() != 1) {
             holder.recyclerView3.setVisibility(View.GONE);
         } else {
-            easyAdapter3 = new EasyAdapter(item.getRecDataList3(), context);
             easyAdapter3 = new EasyAdapter(item.getRecDataList3(), context);
             LinearLayoutManager linearLayoutManager3 = new LinearLayoutManager(context);
             linearLayoutManager3.setOrientation(LinearLayoutManager.HORIZONTAL); //把列表设置成水平滚动

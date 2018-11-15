@@ -49,6 +49,8 @@ public class SeriesRPresenter extends AbsBasePresenter<SeriesRContract.View> imp
 
     Items itemsAll = new Items();
 
+    RecyclerTitleBean recyclerTitleBean = new RecyclerTitleBean();
+
     @Inject
     public SeriesRPresenter(SeriesApis regionApis) {
         mSeriesApis = regionApis;
@@ -87,7 +89,6 @@ public class SeriesRPresenter extends AbsBasePresenter<SeriesRContract.View> imp
             }
         }
 
-        RecyclerTitleBean recyclerTitleBean = new RecyclerTitleBean();
         recyclerTitleBean.setType(type);
         recyclerTitleBean.setRecDataList1(list1);
         recyclerTitleBean.setRecDataList2(list2);
@@ -104,7 +105,7 @@ public class SeriesRPresenter extends AbsBasePresenter<SeriesRContract.View> imp
         }
 
         recyclerTitleBean.setPosition1(htype);
-        items.add(recyclerTitleBean);
+//        items.add(recyclerTitleBean);
 
         List<SeriesBean.Episode> episodes = cateInfoBean.getRecommendlist();
         for (SeriesBean.Episode episode : episodes) {
@@ -141,8 +142,8 @@ public class SeriesRPresenter extends AbsBasePresenter<SeriesRContract.View> imp
 
                     @Override
                     public void onNext(@NonNull Items items) {
-                        itemsAll = items;
                         mView.onDataUpdated(items);
+                        mView.onDataRangeUpdated(recyclerTitleBean);
                     }
 
                     @Override
@@ -181,9 +182,7 @@ public class SeriesRPresenter extends AbsBasePresenter<SeriesRContract.View> imp
 
                     @Override
                     public void onNext(@NonNull Items items) {
-                        mView.onDataRangeUpdated(items, itemsAll, 1);
-                        //保持老数据的更新到上一次
-                        itemsAll = items;
+                        mView.onDataUpdated(items);
                     }
 
                     @Override

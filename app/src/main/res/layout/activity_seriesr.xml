@@ -28,6 +28,9 @@
             android:layout_height="wrap_content" />
     </RelativeLayout>
 
+    <include
+        layout="@layout/item_title_recyclerview"/>
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recyclerViewContent"
         android:layout_width="match_parent"

@@ -14,8 +14,9 @@
         android:layout_marginRight="8dp"
         android:layout_height="30dp">
         <TextView
+            android:id="@+id/hot_keyword"
             android:textColor="#80000000"
-            android:text="西虹市首富"
+            android:text=""
             android:textSize="13dp"
             android:layout_centerVertical="true"
             android:drawablePadding="2dp"

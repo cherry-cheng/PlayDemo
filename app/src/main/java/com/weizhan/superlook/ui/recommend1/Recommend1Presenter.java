@@ -3,8 +3,10 @@ import android.util.Log;
 
 import com.common.base.AbsBasePresenter;
 import com.weizhan.superlook.model.api.Recommend1Apis;
+import com.weizhan.superlook.model.bean.SeriesDataResponse;
 import com.weizhan.superlook.model.bean.TTDataResponse;
 import com.weizhan.superlook.model.bean.recommend1.ChangeBean;
+import com.weizhan.superlook.model.bean.recommend1.KeyWordBean;
 import com.weizhan.superlook.model.bean.recommend1.RecommendBean;
 import com.weizhan.superlook.ui.recommend1.viewbinder.Recommend1FooterItemViewBinder;
 import java.util.List;

@@ -5,14 +5,18 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.androidkun.xtablayout.XTabLayout;
+import com.common.base.BaseMvpFragment;
 import com.weizhan.superlook.App;
 import com.weizhan.superlook.R;
 import com.weizhan.superlook.model.event.TabSelectedEvent;
 import com.weizhan.superlook.ui.bangumi.BangumiFragment;
 import com.weizhan.superlook.ui.movie.MovieFragment;
 import com.weizhan.superlook.ui.recommend1.Recommend1Fragment;
+import com.weizhan.superlook.ui.region.RegionContract;
+import com.weizhan.superlook.ui.region.RegionPresenter;
 import com.weizhan.superlook.ui.search.SearchActivity;
 import com.weizhan.superlook.ui.series.SeriesFragment;
 import com.common.base.BaseFragment;
@@ -29,13 +33,14 @@ import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.OnClick;
+import me.drakeet.multitype.Items;
 
 /**
  * 首页主Fragment
  * Created by jiayiyang on 17/4/14.
  */
 
-public class MainFragment extends BaseFragment {
+public class MainFragment extends BaseMvpFragment<HomePresenter> implements HomeContract.View {
 
     @BindView(R.id.tab_layout)
     XTabLayout tabLayout;
@@ -43,6 +48,8 @@ public class MainFragment extends BaseFragment {
     ViewPager viewPager;
     @BindView(R.id.rl_search)
     RelativeLayout rl_search;
+    @BindView(R.id.hot_keyword)
+    TextView hot_keyword;
 
     @Inject
     Recommend1Fragment mRecommend1Fragment;
@@ -84,6 +91,11 @@ public class MainFragment extends BaseFragment {
         mFragments.add(mSeriesFragment);
         mFragments.add(mMovieFragment);
         mFragments.add(mVarietyFragment);
+    }
+
+    @Override
+    public void onDataUpdated(String keyword) {
+        hot_keyword.setText(keyword);
     }
 
     private class MainPagerAdapter extends FragmentPagerAdapter {

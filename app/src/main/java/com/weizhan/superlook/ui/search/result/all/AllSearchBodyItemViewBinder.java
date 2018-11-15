@@ -8,12 +8,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-
-import com.common.util.StringUtil;
-import com.common.util.ToastUtils;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.weizhan.superlook.R;
-import com.weizhan.superlook.model.bean.recommend1.AppRecommend1Show;
+import com.weizhan.superlook.model.bean.series.SeriesBean;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -23,7 +20,7 @@ import me.drakeet.multitype.ItemViewBinder;
  * Created by Administrator on 2018/9/5.
  */
 
-public class AllSearchBodyItemViewBinder extends ItemViewBinder<AppRecommend1Show.Body, AllSearchBodyItemViewBinder.Recommend1BodyViewHolder> {
+public class AllSearchBodyItemViewBinder extends ItemViewBinder<SeriesBean.EpisodeSearch, AllSearchBodyItemViewBinder.Recommend1BodyViewHolder> {
 
     @NonNull
     @Override
@@ -33,15 +30,45 @@ public class AllSearchBodyItemViewBinder extends ItemViewBinder<AppRecommend1Sho
     }
 
     @Override
-    protected void onBindViewHolder(@NonNull AllSearchBodyItemViewBinder.Recommend1BodyViewHolder holder, @NonNull AppRecommend1Show.Body item) {
+    protected void onBindViewHolder(@NonNull AllSearchBodyItemViewBinder.Recommend1BodyViewHolder holder, @NonNull final SeriesBean.EpisodeSearch item) {
         Context context = holder.ivCover.getContext();
-        holder.ivCover.setImageURI(item.getCover());
-        holder.big_tv.setText(item.getTitle());
-        if (item.getIs_ad()) {
-            holder.update_tv.setVisibility(View.GONE);
+        String type = "电影";
+        if (item.getType() == 1) {
+            holder.ivCover.setImageURI(item.getH_img());
+            holder.update_tv.setText("");
+            type = "电影";
         } else {
-            holder.update_tv.setVisibility(View.VISIBLE);
+            if (item.getType() == 2) {
+                holder.update_tv.setText(item.getTimes() + "期");
+                type = "电视剧";
+            } else {
+                type = "综艺";
+                if (item.getCurrent_num() >= item.getTotal()) {
+                    holder.update_tv.setText("完结");
+                } else {
+                    holder.update_tv.setText("更新至" + item.getCurrent_num() + "集");
+                }
+            }
+            holder.ivCover.setImageURI(item.getV_img());
         }
+        holder.big_tv.setText(item.getTitle());
+        holder.score.setText(item.getScore());
+        holder.small_des.setText(item.getDescribes());
+        holder.category_tv.setText(type + " | " + item.getPlace());
+
+        holder.rl_item.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                int type = item.getType();
+                if (type == 1) {
+
+                } else if (type == 2) {
+
+                } else if (type == 3) {
+
+                }
+            }
+        });
     }
 
     static class Recommend1BodyViewHolder extends RecyclerView.ViewHolder {
@@ -58,6 +85,8 @@ public class AllSearchBodyItemViewBinder extends ItemViewBinder<AppRecommend1Sho
         TextView category_tv;
         @BindView(R.id.update_tv)
         TextView update_tv;
+        @BindView(R.id.rl_item)
+        RelativeLayout rl_item;
 
         public Recommend1BodyViewHolder(View itemView) {
             super(itemView);

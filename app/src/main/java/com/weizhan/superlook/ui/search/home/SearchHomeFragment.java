@@ -13,7 +13,7 @@ import com.common.base.BaseMvpFragment;
 import com.common.util.ToastUtils;
 import com.weizhan.superlook.App;
 import com.weizhan.superlook.R;
-import com.weizhan.superlook.model.bean.search.HotWord;
+import com.weizhan.superlook.model.bean.recommend1.KeyWordBean;
 import com.weizhan.superlook.model.bean.search.SearchKey;
 import com.weizhan.superlook.model.event.ClickMessage;
 import com.weizhan.superlook.ui.search.viewbinder.HotSearchViewBinder;
@@ -62,7 +62,7 @@ public class SearchHomeFragment extends BaseMvpFragment<SearchHomePresenter> imp
         hotRecyclerView.addItemDecoration(new SearchIndexItemDecoration());
         hotRecyclerView.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.white));
         mAdapter = new CommonAdapter(0, 99);
-        mAdapter.register(HotWord.class, new HotSearchViewBinder());
+        mAdapter.register(KeyWordBean.class, new HotSearchViewBinder());
         mAdapter.setScrollSaveStrategyEnabled(true);
         hotRecyclerView.setAdapter(mAdapter);
         setHistory();

@@ -3,13 +3,11 @@ package com.weizhan.superlook.ui.search.result.all;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-
 import com.common.base.BaseMvpFragment;
 import com.weizhan.superlook.App;
 import com.weizhan.superlook.R;
-import com.weizhan.superlook.model.bean.recommend1.AppRecommend1Show;
+import com.weizhan.superlook.model.bean.series.SeriesBean;
 import com.weizhan.superlook.widget.adapter.CommonAdapter;
-
 import butterknife.BindView;
 import me.drakeet.multitype.Items;
 
@@ -44,9 +42,11 @@ public class AllSearchFragment extends BaseMvpFragment<AllSearchPresenter> imple
         mRecyclerView.addItemDecoration(new AllSearchIndexItemDecoration());
         mRecyclerView.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.white));
         mAdapter = new CommonAdapter(1, 99);
-        mAdapter.register(AppRecommend1Show.Body.class, new AllSearchBodyItemViewBinder());
+        mAdapter.register(SeriesBean.EpisodeSearch.class, new AllSearchBodyItemViewBinder());
         mAdapter.setScrollSaveStrategyEnabled(true);
         mRecyclerView.setAdapter(mAdapter);
+
+        mPresenter.onDataSearch(0, "喜剧");
     }
 
     @Override

@@ -23,22 +23,27 @@ public class EasyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
     private OnItemClickListener onItemClickListener;
     private OnItemSingleSelectListener onItemSingleSelectListener;
 
-    private List<String> list = new ArrayList<String>();
+    private List<String> list;
     private Context mContext;
     public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
         this.onItemClickListener = onItemClickListener;
     }
 
-    public void setData(List<String> newList) {
+    public void setData(List<String> newList, int position) {
         if (newList != null && newList.size() > 0)
         this.list.clear();
         this.list = newList;
+        this.singleSelected = position;
         notifyDataSetChanged();
     }
 
     public EasyAdapter(List<String> list, Context context) {
         this.list = list;
         this.mContext = context;
+    }
+
+    public EasyAdapter() {
+        list = new ArrayList<String>();
     }
 
     public void setOnItemSingleSelectListener(OnItemSingleSelectListener onItemSingleSelectListener) {

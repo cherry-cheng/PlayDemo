@@ -2,7 +2,6 @@ package com.weizhan.superlook.ui.search.viewbinder;
 
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,7 +10,7 @@ import android.widget.TextView;
 
 import com.common.util.ToastUtils;
 import com.weizhan.superlook.R;
-import com.weizhan.superlook.model.bean.search.HotWord;
+import com.weizhan.superlook.model.bean.recommend1.KeyWordBean;
 import com.weizhan.superlook.model.event.ClickMessage;
 
 import org.greenrobot.eventbus.EventBus;
@@ -24,7 +23,7 @@ import me.drakeet.multitype.ItemViewBinder;
  * Created by Administrator on 2018/9/10.
  */
 
-public class HotSearchViewBinder extends ItemViewBinder<HotWord, HotSearchViewBinder.HotSearchViewHolder> {
+public class HotSearchViewBinder extends ItemViewBinder<KeyWordBean, HotSearchViewBinder.HotSearchViewHolder> {
 
     @NonNull
     @Override
@@ -34,7 +33,7 @@ public class HotSearchViewBinder extends ItemViewBinder<HotWord, HotSearchViewBi
     }
 
     @Override
-    protected void onBindViewHolder(@NonNull HotSearchViewBinder.HotSearchViewHolder holder, @NonNull final HotWord item) {
+    protected void onBindViewHolder(@NonNull HotSearchViewBinder.HotSearchViewHolder holder, @NonNull final KeyWordBean item) {
         if (holder.getPosition() == 0) {
             holder.tv_number.setBackgroundResource(R.drawable.bg_hotsearch);
         } else if (holder.getPosition() == 1) {
@@ -45,13 +44,13 @@ public class HotSearchViewBinder extends ItemViewBinder<HotWord, HotSearchViewBi
             holder.tv_number.setBackgroundResource(R.drawable.bg_hotsearchword);
         }
         holder.tv_number.setText((holder.getPosition() + 1) + "");
-        holder.hotTv.setText(item.getKeyword());
+        holder.hotTv.setText(item.getKeywords());
         holder.hot_rl.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 ToastUtils.showLongToast("点击了热词");
                 ClickMessage clickMessage = new ClickMessage();
-                clickMessage.setSearchString(item.getKeyword());
+                clickMessage.setSearchString(item.getKeywords());
                 EventBus.getDefault().post(clickMessage);
             }
         });

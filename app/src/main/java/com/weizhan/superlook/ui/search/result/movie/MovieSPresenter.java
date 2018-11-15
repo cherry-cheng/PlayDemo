@@ -7,7 +7,9 @@ import com.common.util.DateUtil;
 import com.weizhan.superlook.model.api.ApiHelper;
 import com.weizhan.superlook.model.api.Recommend1Apis;
 import com.weizhan.superlook.model.bean.DataListResponse;
+import com.weizhan.superlook.model.bean.SeriesDataResponse;
 import com.weizhan.superlook.model.bean.recommend1.AppRecommend1Show;
+import com.weizhan.superlook.model.bean.series.SeriesBean;
 
 import java.util.List;
 
@@ -38,20 +40,32 @@ public class MovieSPresenter extends AbsBasePresenter<MovieSContract.View> {
 
     @Override
     public void loadData() {
+    }
+
+    private Items mapShow2Items(List<SeriesBean.EpisodeSearch> episodes) {
         Items items = new Items();
-//        items.add(new SeriesHeaderItemViewBinder.Recommend1Header());
+        List<SeriesBean.EpisodeSearch> episodes1 = episodes;
+        for (SeriesBean.EpisodeSearch episode : episodes1) {
+            items.add(episode);
+        }
+        return items;
+    }
+
+
+    @Override
+    public void releaseData() {
+
+    }
+
+    public void onDataSearch(int type, String keywords) {
+        Items items = new Items();
         mView.onDataUpdated(items);
-        mRecommend1Apis.getRecommend1Show(
-                ApiHelper.APP_KEY,
-                ApiHelper.BUILD,
-                ApiHelper.MOBI_APP,
-                ApiHelper.PLATFORM,
-                DateUtil.getSystemTime())
+        mRecommend1Apis.getSearchResult(type, keywords)
                 .subscribeOn(Schedulers.newThread())
-                .map(new Function<DataListResponse<AppRecommend1Show>, Items>() {
+                .map(new Function<SeriesDataResponse<SeriesBean.EpisodeSearch>, Items>() {
                     @Override
-                    public Items apply(@NonNull DataListResponse<AppRecommend1Show> regionShow) throws Exception {
-                        return regionShow2Items(regionShow);
+                    public Items apply(@NonNull SeriesDataResponse<SeriesBean.EpisodeSearch> episodes) throws Exception {
+                        return mapShow2Items(episodes.getBody());
                     }
                 })
                 .observeOn(AndroidSchedulers.mainThread())
@@ -79,27 +93,5 @@ public class MovieSPresenter extends AbsBasePresenter<MovieSContract.View> {
 
                     }
                 });
-    }
-
-    private Items regionShow2Items(DataListResponse<AppRecommend1Show> regionShow) {
-        Items items = new Items();
-//        items.add(new SeriesHeaderItemViewBinder.Recommend1Header());
-        List<AppRecommend1Show> regionShowList = regionShow.getData();
-        int uu = 1;
-        for (AppRecommend1Show appRecommend1Show : regionShowList) {
-            //body
-            List<AppRecommend1Show.Body> bodyList = appRecommend1Show.getBody();
-            for (AppRecommend1Show.Body b : bodyList) {
-                items.add(b);
-            }
-            break;
-        }
-        return items;
-    }
-
-
-    @Override
-    public void releaseData() {
-
     }
 }

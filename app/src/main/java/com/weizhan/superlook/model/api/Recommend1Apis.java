@@ -1,13 +1,16 @@
 package com.weizhan.superlook.model.api;
 
 import com.weizhan.superlook.model.bean.DataListResponse;
+import com.weizhan.superlook.model.bean.SeriesDataResponse;
 import com.weizhan.superlook.model.bean.TTDataResponse;
 
 import com.weizhan.superlook.model.bean.play.PlayInfoBean;
 import com.weizhan.superlook.model.bean.play.PlayMoreInfoBean;
 import com.weizhan.superlook.model.bean.recommend1.AppRecommend1Show;
 import com.weizhan.superlook.model.bean.recommend1.ChangeBean;
+import com.weizhan.superlook.model.bean.recommend1.KeyWordBean;
 import com.weizhan.superlook.model.bean.recommend1.RecommendBean;
+import com.weizhan.superlook.model.bean.series.SeriesBean;
 
 import io.reactivex.Observable;
 import retrofit2.http.GET;
@@ -49,4 +52,10 @@ public interface Recommend1Apis {
     Observable<TTDataResponse<ChangeBean>> getChangeInfo(@Query("id") int id,
                                                          @Query("type") int type,
                                                          @Query("page") int page);
+    @GET("/api/searchkeywords")
+    Observable<SeriesDataResponse<KeyWordBean>> getKeyWords();
+
+    @GET("/api/dosearch")
+    Observable<SeriesDataResponse<SeriesBean.EpisodeSearch>> getSearchResult(@Query("type") int type,
+                                                                       @Query("keywords") String keywords);
 }

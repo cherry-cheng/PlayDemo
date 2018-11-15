@@ -158,6 +158,9 @@ public class SearchActivity extends BaseActivity implements IBaseMvpActivity<Sea
     @Override
     public void initViewAndEvent() {
 //        showHideFragment(searchHomeFragment);
+        if (App.getInstance().getKeyWordBeans().size() != 0) {
+            et_input.setHint(App.getInstance().getKeyWordBeans().get(0).getKeywords());
+        }
         et_input.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {

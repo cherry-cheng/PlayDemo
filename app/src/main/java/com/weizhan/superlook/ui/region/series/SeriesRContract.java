@@ -18,7 +18,7 @@ public interface SeriesRContract {
 
         void showLoadFailed();
 
-        void onDataRangeUpdated(Items newItems, Items oldItems, int startPosition);
+        void onDataRangeUpdated(RecyclerTitleBean recyclerTitleBean);
     }
 
     interface Presenter extends BasePresenter {

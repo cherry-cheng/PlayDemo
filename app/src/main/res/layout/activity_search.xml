@@ -22,7 +22,7 @@
             android:id="@+id/et_input"
             android:textColor="#000000"
             android:textColorHint="#80000000"
-            android:hint="西虹市首富"
+            android:hint=""
             android:textSize="13dp"
             android:paddingLeft="8dp"
             android:singleLine="true"

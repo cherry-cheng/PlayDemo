@@ -17,6 +17,7 @@ import com.weizhan.superlook.di.component.DaggerFragmentComponent;
 import com.weizhan.superlook.di.component.FragmentComponent;
 import com.weizhan.superlook.di.module.ApiModule;
 import com.weizhan.superlook.di.module.FragmentModule;
+import com.weizhan.superlook.model.bean.recommend1.KeyWordBean;
 import com.weizhan.superlook.model.bean.recommend1.RecommendBean;
 import com.weizhan.superlook.util.RealmHelper;
 import com.weizhan.superlook.widget.CustomBitmapMemoryCacheParamsSupplier;
@@ -30,6 +31,7 @@ import com.facebook.common.memory.NoOpMemoryTrimmableRegistry;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.imagepipeline.core.ImagePipelineConfig;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import io.realm.Realm;
@@ -57,6 +59,16 @@ public class App extends Application {
 
     public static void setData(List<RecommendBean.Banner> data) {
         App.data = data;
+    }
+
+    private List<KeyWordBean> keyWordBeans = new ArrayList<KeyWordBean>();
+
+    public List<KeyWordBean> getKeyWordBeans() {
+        return keyWordBeans;
+    }
+
+    public void setKeyWordBeans(List<KeyWordBean> keyWordBeans) {
+        this.keyWordBeans = keyWordBeans;
     }
 
     @Override
