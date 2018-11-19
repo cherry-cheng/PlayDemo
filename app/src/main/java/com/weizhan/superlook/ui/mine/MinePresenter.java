@@ -3,18 +3,14 @@ package com.weizhan.superlook.ui.mine;
 import android.util.Log;
 
 import com.common.base.AbsBasePresenter;
-import com.common.util.DateUtil;
 import com.google.gson.Gson;
-import com.weizhan.superlook.model.api.ApiHelper;
 import com.weizhan.superlook.model.api.RegionApis;
-import com.weizhan.superlook.model.bean.DataListResponse;
 import com.weizhan.superlook.model.bean.TTDataResponse;
 import com.weizhan.superlook.model.bean.mine.PostUserBean;
+import com.weizhan.superlook.model.bean.mine.UpdateBean;
 import com.weizhan.superlook.model.bean.mine.UserBean;
-import com.weizhan.superlook.model.bean.region.AppRegionShow;
+import com.weizhan.superlook.util.Constants;
 import com.weizhan.superlook.util.SpUtils;
-
-import java.util.List;
 
 import javax.inject.Inject;
 
@@ -75,6 +71,9 @@ public class MinePresenter extends AbsBasePresenter<MineContract.View> {
                         SpUtils.putBoolean(getContext(), "isLogin", true);
                         SpUtils.putString(getContext(), "iconurl", userBean.getHeaderimg());
                         SpUtils.putString(getContext(), "name", userBean.getUsername());
+                        SpUtils.putString(getContext(), "uid", userBean.getUid());
+                        Log.e("cyh112", "uid = " + userBean.getUid());
+                        Constants.UID = userBean.getUid();
                         mView.onDataUpdated();
                     }
 
@@ -83,6 +82,44 @@ public class MinePresenter extends AbsBasePresenter<MineContract.View> {
                         Log.e(TAG, "onError");
                         e.printStackTrace();
                         mView.showLoadFailed();
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        Log.d(TAG, "onComplete");
+                    }
+                });
+    }
+
+
+    public void getUpdateInfo(String channel) {
+        mRegionApis.getUpdateInfo(channel)
+                .subscribeOn(Schedulers.newThread())
+                .map(new Function<TTDataResponse<UpdateBean>, UpdateBean>() {
+                    @Override
+                    public UpdateBean apply(@NonNull TTDataResponse<UpdateBean> regionShow) throws Exception {
+                        UpdateBean updateBean = regionShow.getBody();
+                        return updateBean;
+                    }
+                })
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<UpdateBean>() {
+                    @Override
+                    public void onSubscribe(@NonNull Disposable d) {
+                        registerRx(d);
+                    }
+
+                    @Override
+                    public void onNext(@NonNull UpdateBean updateBean) {
+                        //决定弹框还是提示
+                        Log.e("cyh777", "linkurl = " + updateBean.getLinkurl());
+                        mView.updateInfo(updateBean);
+                    }
+
+                    @Override
+                    public void onError(@NonNull Throwable e) {
+                        Log.e(TAG, "onError");
+                        e.printStackTrace();
                     }
 
                     @Override

@@ -24,6 +24,7 @@ import com.weizhan.superlook.R;
 import com.weizhan.superlook.model.bean.search.SearchKey;
 import com.weizhan.superlook.model.event.ClickMessage;
 import com.weizhan.superlook.model.event.JumpActivity;
+import com.weizhan.superlook.model.event.VisibleClickSearch;
 import com.weizhan.superlook.ui.search.home.SearchHomeFragment;
 import com.weizhan.superlook.ui.search.need.NeedMovieActivity;
 import com.weizhan.superlook.ui.search.result.SearchResultFragment;
@@ -79,13 +80,6 @@ public class SearchActivity extends BaseActivity implements IBaseMvpActivity<Sea
     void Cancel() {
         cancel_iv.setVisibility(View.GONE);
         icon_search.setVisibility(View.VISIBLE);
-//        showHideFragment(searchHomeFragment, searchResultFragment);
-//        replaceFragment(searchHomeFragment, false);
-/*        if (searchHomeFragment.isHidden()) {
-            showHideFragment(searchHomeFragment);
-        } else {
-            start(searchHomeFragment);
-        }*/
         et_input.setText("");
 
     }
@@ -94,29 +88,7 @@ public class SearchActivity extends BaseActivity implements IBaseMvpActivity<Sea
     void onSearch() {
         String keyword = et_input.getText().toString();
         keyword = TextUtils.isEmpty(keyword) ? et_input.getHint().toString() : keyword;
-        //hint赋值到内容
-        et_input.setText(keyword);
-        et_input.setSelection(et_input.getText().length());
-        //收起软键盘
-        hideKeyboard(et_input);
-        //跳入搜索结果界面
-//        replaceFragment(searchResultFragment, false);
-//        showHideFragment(searchResultFragment, searchHomeFragment);
-        if (searchResultFragment.isVisible()) {
-//            showHideFragment(searchResultFragment);
-            //刷新当前的fragment
-            searchResultFragment.onAttach(this);
-        } else {
-            start(searchResultFragment);
-        }
-        if (TextUtils.isEmpty(keyword.trim())) {
-            //如果输入空，不去请求服务器,直接显示缺省
-//            replaceFragment(searchResultFragment, false);
-//            showHideFragment(searchResultFragment, searchHomeFragment);
-//            start(searchResultFragment);
-        } else {
-            getSearchResult(keyword);
-        }
+        GoSearchAction(keyword);
     }
 
     private void GoSearchAction(String hotword) {
@@ -128,7 +100,14 @@ public class SearchActivity extends BaseActivity implements IBaseMvpActivity<Sea
         if (searchResultFragment.isVisible()) {
             //刷新当前的fragment
             searchResultFragment.onAttach(this);
+            //如果可见的话，直接post参数，通知各个fragment更新
+            VisibleClickSearch visibleClickSearch = new VisibleClickSearch();
+            visibleClickSearch.setSearchword(hotword);
+            EventBus.getDefault().post(visibleClickSearch);
         } else {
+            Bundle bundle = new Bundle();
+            bundle.putString("search", hotword);
+            searchResultFragment.setArguments(bundle);
             start(searchResultFragment);
         }
         getSearchResult(hotword);

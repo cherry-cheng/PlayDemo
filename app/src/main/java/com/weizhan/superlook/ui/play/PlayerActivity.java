@@ -5,6 +5,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -13,17 +14,21 @@ import android.widget.LinearLayout;
 
 import com.common.base.BaseActivity;
 import com.common.base.IBaseMvpActivity;
+import com.common.util.ToastUtils;
 import com.dueeeke.videocontroller.StandardVideoController;
 import com.dueeeke.videoplayer.player.IjkVideoView;
 import com.dueeeke.videoplayer.player.PlayerConfig;
+import com.umeng.socialize.UMShareAPI;
 import com.weizhan.superlook.App;
 import com.weizhan.superlook.R;
 import com.weizhan.superlook.model.bean.play.PlayInfoBean;
 import com.weizhan.superlook.model.bean.play.TestBean;
-import com.weizhan.superlook.model.bean.recommend1.AppRecommend1Show;
+import com.weizhan.superlook.model.event.Play;
 import com.weizhan.superlook.model.event.PlayPost;
-import com.weizhan.superlook.model.event.RangeRefresh;
+import com.weizhan.superlook.util.ShareUtil;
+import com.weizhan.superlook.util.SpUtils;
 import com.weizhan.superlook.widget.adapter.CommonAdapter;
+import com.weizhan.superlook.widget.dialog.SharePopWindow;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -38,9 +43,8 @@ import butterknife.BindView;
 import me.drakeet.multitype.Items;
 
 public class PlayerActivity extends BaseActivity implements IBaseMvpActivity<PlayPresenter>, PlayContract.View {
-
     private IjkVideoView ijkVideoView;
-
+    private SharePopWindow sharePopWindow;
     @Inject
     PlayPresenter mPresenter;
     @BindView(R.id.guessLike_recyclerView)
@@ -51,6 +55,8 @@ public class PlayerActivity extends BaseActivity implements IBaseMvpActivity<Pla
 
     private List<String> list1 = new ArrayList<String>();
     private List<String> list2 = new ArrayList<String>();
+
+    PlayTitleItemViewBinder playTitleItemViewBinder;
 
     @Override
     protected void onPause() {
@@ -91,6 +97,41 @@ public class PlayerActivity extends BaseActivity implements IBaseMvpActivity<Pla
         App.getInstance().getActivityComponent().inject(this);
     }
 
+    class tvClickListenr implements PlayTitleItemViewBinder.tvClick {
+
+        @Override
+        public void ontvClick(ImageView imageView, LinearLayout linearLayout) {
+            if (imageView.isSelected()) {
+                imageView.setSelected(false);
+                linearLayout.setVisibility(View.GONE);
+            } else {
+                imageView.setSelected(true);
+                linearLayout.setVisibility(View.VISIBLE);
+                guessLike_recyclerView.scrollToPosition(0);
+            }
+        }
+
+        @Override
+        public void onUserLoveClick(ImageView imageView, int id, int type, int isLove) {
+            Log.i("cyh112", "isLogin = " + SpUtils.getBoolean(PlayerActivity.this, "isLogin", false));
+            if (SpUtils.getBoolean(PlayerActivity.this, "isLogin", false)) {
+                mPresenter.lovesMovie(id, type, isLove);
+            } else {
+                ToastUtils.showLongToast("请先登录");
+            }
+        }
+
+        @Override
+        public void onUserShareClick(ImageView imageView) {
+            //分享应用
+            sharePopWindow = new SharePopWindow(PlayerActivity.this, itemsOnClick);
+            sharePopWindow.setAnimationStyle(R.style.PopupWindow);
+            sharePopWindow.showAtLocation(imageView, Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL, 0, 0);
+        }
+    }
+
+    tvClickListenr clickListenr = new tvClickListenr();
+    GridLayoutManager layoutManager;
     @Override
     public void initViewAndEvent() {
         ijkVideoView = findViewById(R.id.player);
@@ -98,7 +139,7 @@ public class PlayerActivity extends BaseActivity implements IBaseMvpActivity<Pla
         int id = intent.getIntExtra("id", 0);
         int type = intent.getIntExtra("type", 0);
         Log.e("PlayPresenter", "id = " + id + " type = " + type);
-        GridLayoutManager layoutManager = new GridLayoutManager(this, SPAN_COUNT);
+        layoutManager = new GridLayoutManager(this, SPAN_COUNT);
         GridLayoutManager.SpanSizeLookup spanSizeLookup = new GridLayoutManager.SpanSizeLookup() {
             @Override
             public int getSpanSize(int position) {
@@ -111,26 +152,13 @@ public class PlayerActivity extends BaseActivity implements IBaseMvpActivity<Pla
         guessLike_recyclerView.addItemDecoration(new GuessLikeItemDecoration());
         guessLike_recyclerView.setBackgroundColor(ContextCompat.getColor(this, R.color.white));
         mAdapter = new CommonAdapter(0, 99);
-        PlayTitleItemViewBinder playTitleItemViewBinder = new PlayTitleItemViewBinder();
-        playTitleItemViewBinder.setClickListenr(new PlayTitleItemViewBinder.tvClick() {
-            @Override
-            public void ontvClick(ImageView imageView, LinearLayout linearLayout) {
-                if (imageView.isSelected()) {
-                    imageView.setSelected(false);
-                    linearLayout.setVisibility(View.GONE);
-                } else {
-                    imageView.setSelected(true);
-                    linearLayout.setVisibility(View.VISIBLE);
-                    guessLike_recyclerView.scrollToPosition(0);
-                }
-            }
-        });
+        playTitleItemViewBinder = new PlayTitleItemViewBinder();
+        playTitleItemViewBinder.setClickListenr(clickListenr);
         mAdapter.register(PlayInfoBean.PlayBean.class, playTitleItemViewBinder);
         mAdapter.register(PlayInfoBean.PlayRecommendBean.class, new GueLikeMVItemViewBinder());
         mAdapter.register(TestBean.class, new GuessTitleViewBinder());
         mAdapter.setScrollSaveStrategyEnabled(true);
         guessLike_recyclerView.setAdapter(mAdapter);
-
         mPresenter.loadPlayInfo(id, type);
     }
 
@@ -180,6 +208,42 @@ public class PlayerActivity extends BaseActivity implements IBaseMvpActivity<Pla
         ijkVideoView.setTitle(title);
         ijkVideoView.setVideoController(controller);
         ijkVideoView.start();
+        Log.e("cyh777", "play------0-----");
+        EventBus.getDefault().post(new Play());
+    }
+
+    @Override
+    public void updateIsLove(int isLove) {
+        //将是否收藏的按键改变状态
+        ImageView imageView = playTitleItemViewBinder.getImageView();
+        if (isLove == 0) {
+            //未登录
+            imageView.setSelected(false);
+        } else if (isLove == 1) {
+            //收藏
+            imageView.setSelected(true);
+        } else {
+            //未收藏
+            imageView.setSelected(false);
+        }
+    }
+
+    @Override
+    public void loveMovies(int love) {
+        ImageView imageView = playTitleItemViewBinder.getImageView();
+        boolean isLove = imageView.isSelected();
+        if (love == 0) {
+            //未登录
+        } else if (love == 1) {
+            //成功
+            if (isLove) {
+                imageView.setSelected(false);
+            } else {
+                imageView.setSelected(true);
+            }
+        } else {
+            //失败
+        }
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -187,5 +251,33 @@ public class PlayerActivity extends BaseActivity implements IBaseMvpActivity<Pla
         if (playPost != null) {
             mPresenter.loadPlayInfo(playPost.getId(), playPost.getType());
         }
+    }
+
+    private View.OnClickListener itemsOnClick = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            sharePopWindow.dismiss();
+            sharePopWindow.backgroundAlpha(PlayerActivity.this, 1f);
+            switch (view.getId()) {
+                case R.id.weixinf:
+                    ShareUtil.weiXin(view, PlayerActivity.this);
+                    break;
+                case R.id.wechatc:
+                    ShareUtil.weixinCircle(view, PlayerActivity.this);
+                    break;
+                case R.id.sina:
+                    ShareUtil.sina(view, PlayerActivity.this);
+                    break;
+                default:
+                    break;
+            }
+        }
+    };
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        UMShareAPI.get(PlayerActivity.this).onActivityResult(requestCode, resultCode, data);
+        Log.i("cyh333", "有回调妈？？？？？？？？");
     }
 }

@@ -6,7 +6,7 @@
 
     <TextView
         android:id="@+id/tv_more"
-        android:text="更多好看剧集"
+        android:text="更多"
         android:textColor="#ffff850b"
         android:textSize="12sp"
         android:layout_marginLeft="44dp"

@@ -1,17 +1,11 @@
 package com.weizhan.superlook.util;
 
+import com.weizhan.superlook.model.bean.past.PastBean;
 import com.weizhan.superlook.model.bean.search.SearchKey;
 
 import java.util.List;
 
 import io.realm.Realm;
-
-
-/**
- * @author: Est <codeest.dev@gmail.com>
- * @date: 2017/4/21
- * @description:
- */
 
 public interface DBHelper {
     Realm getRealm();
@@ -24,4 +18,9 @@ public interface DBHelper {
     void deleteSearchHistoryAll();
 
     List<SearchKey> getSearchHistoryListAll();
+
+    //影片
+    void insertPlayInfo(PastBean pastBean);
+    List<PastBean> getPlayInfoHistoryList(String id);
+    List<PastBean> getPlayInfoAll();
 }

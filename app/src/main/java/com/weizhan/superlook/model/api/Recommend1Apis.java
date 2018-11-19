@@ -8,6 +8,7 @@ import com.weizhan.superlook.model.bean.play.PlayInfoBean;
 import com.weizhan.superlook.model.bean.play.PlayMoreInfoBean;
 import com.weizhan.superlook.model.bean.recommend1.AppRecommend1Show;
 import com.weizhan.superlook.model.bean.recommend1.ChangeBean;
+import com.weizhan.superlook.model.bean.recommend1.ISLoveBean;
 import com.weizhan.superlook.model.bean.recommend1.KeyWordBean;
 import com.weizhan.superlook.model.bean.recommend1.RecommendBean;
 import com.weizhan.superlook.model.bean.series.SeriesBean;
@@ -56,6 +57,19 @@ public interface Recommend1Apis {
     Observable<SeriesDataResponse<KeyWordBean>> getKeyWords();
 
     @GET("/api/dosearch")
-    Observable<SeriesDataResponse<SeriesBean.EpisodeSearch>> getSearchResult(@Query("type") int type,
+    Observable<SeriesDataResponse<SeriesBean.EpisodeSearch>> getSearchResult(@Query("type") String type,
                                                                        @Query("keywords") String keywords);
+
+    @GET("/api/islove")
+    Observable<TTDataResponse<ISLoveBean>> getIsLove(@Query("id") int id,
+                                                     @Query("type") int type);
+
+    @GET("/api/lovesmovie")
+    Observable<TTDataResponse<ISLoveBean>> lovesMovie(@Query("id") int id,
+                                                      @Query("type") int type,
+                                                      @Query("islove") int islove);
+
+    @GET("/api/userlovelist")
+    Observable<SeriesDataResponse<SeriesBean.EpisodeSearch>> getUserLoveList();
+
 }

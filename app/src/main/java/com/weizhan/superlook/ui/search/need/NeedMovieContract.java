@@ -11,6 +11,9 @@ public interface NeedMovieContract {
 
     interface View extends BaseView {
 
+        void onSuccess();
+        void onFail();
+
     }
 
     interface Presenter extends BasePresenter {

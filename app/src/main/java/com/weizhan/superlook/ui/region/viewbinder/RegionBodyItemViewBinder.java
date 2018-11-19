@@ -11,7 +11,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.weizhan.superlook.R;
-import com.weizhan.superlook.model.bean.region.AppRegionShow;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.weizhan.superlook.model.bean.region.CatePost;
 import com.weizhan.superlook.model.bean.region.RegionBean;

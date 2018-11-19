@@ -3,12 +3,17 @@ package com.weizhan.superlook.ui.play;
 import android.util.Log;
 
 import com.common.base.AbsBasePresenter;
+import com.weizhan.superlook.App;
 import com.weizhan.superlook.model.api.Recommend1Apis;
 import com.weizhan.superlook.model.bean.TTDataResponse;
+import com.weizhan.superlook.model.bean.past.PastBean;
 import com.weizhan.superlook.model.bean.play.PlayInfoBean;
 import com.weizhan.superlook.model.bean.play.PlayMoreInfoBean;
 import com.weizhan.superlook.model.bean.play.TestBean;
 import com.weizhan.superlook.model.bean.play.TestSeriesBean;
+import com.weizhan.superlook.model.bean.recommend1.ISLoveBean;
+import com.weizhan.superlook.util.RealmHelper;
+import com.weizhan.superlook.util.SpUtils;
 
 import java.util.List;
 import javax.inject.Inject;
@@ -52,15 +57,19 @@ public class Play1Presenter extends AbsBasePresenter<Play1Contract.View> impleme
         // 播放详情下面的信息需要添加，待续...........
         items.add(playBean);
 
-        //选集
-        TestBean testBean1 = new TestBean();
-        testBean1.setTitle("选集");
-        items.add(testBean1);
+        if (playMoreInfoBean.getNum() != null && playMoreInfoBean.getNum().size() > 0) {
+            //选集
+            TestBean testBean1 = new TestBean();
+            testBean1.setTitle("选集");
+            items.add(testBean1);
 
-        TestSeriesBean testSeriesBean = new TestSeriesBean();
-        testSeriesBean.setList(playMoreInfoBean.getNum());
-        items.add(testSeriesBean);
-        playUrl = playMoreInfoBean.getNum().get(0).getLinkurl();
+            TestSeriesBean testSeriesBean = new TestSeriesBean();
+            testSeriesBean.setList(playMoreInfoBean.getNum());
+            items.add(testSeriesBean);
+            playUrl = playMoreInfoBean.getNum().get(0).getLinkurl();
+        } else {
+            playUrl = "a.mp4";
+        }
         playTitle = playMoreInfoBean.getInfo().getTitle();
         TestBean testBean = new TestBean();
         testBean.setTitle("猜你喜欢");
@@ -71,8 +80,80 @@ public class Play1Presenter extends AbsBasePresenter<Play1Contract.View> impleme
         return items;
     }
 
+    public void lovesMovie(int id, int type, int islove) {
+        mRecommend1Apis.lovesMovie(id, type, islove)
+                .subscribeOn(Schedulers.io())
+                .map(new Function<TTDataResponse<ISLoveBean>, ISLoveBean>() {
+                    @Override
+                    public ISLoveBean apply(@NonNull TTDataResponse<ISLoveBean> isLoveBeanTTDataResponse) throws Exception {
+                        return isLoveBeanTTDataResponse.getBody();
+                    }
+                })
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<ISLoveBean>() {
+                    @Override
+                    public void onSubscribe(@NonNull Disposable d) {
+                        registerRx(d);
+                    }
+
+                    @Override
+                    public void onNext(@NonNull ISLoveBean isLoveBean) {
+                        Log.e("cyh112", "是否请求成功" + isLoveBean.getStatus());
+                        mView.loveMovies(isLoveBean.getStatus());
+                        // 0是未登录 1是成功 2是失败
+                    }
+
+                    @Override
+                    public void onError(@NonNull Throwable e) {
+                        Log.e(TAG, "onError");
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        Log.d(TAG, "onComplete");
+                    }
+                });
+    }
+
+    public void isLove(int id, int type) {
+        Log.e("cyh112", "请求开始 = " + id + "  " + type);
+        mRecommend1Apis.getIsLove(id, type)
+                .subscribeOn(Schedulers.io())
+                .map(new Function<TTDataResponse<ISLoveBean>, ISLoveBean>() {
+                    @Override
+                    public ISLoveBean apply(@NonNull TTDataResponse<ISLoveBean> isLoveBeanTTDataResponse) throws Exception {
+                        return isLoveBeanTTDataResponse.getBody();
+                    }
+                })
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<ISLoveBean>() {
+                    @Override
+                    public void onSubscribe(@NonNull Disposable d) {
+                        registerRx(d);
+                    }
+
+                    @Override
+                    public void onNext(@NonNull ISLoveBean isLoveBean) {
+                        Log.e("cyh112", "是否请求成功" + isLoveBean.getStatus());
+                        mView.updateIsLove(isLoveBean.getStatus());
+                        // 0是未登录 1是收藏 2是未收藏
+                    }
+
+                    @Override
+                    public void onError(@NonNull Throwable e) {
+                        Log.e(TAG, "onError");
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        Log.d(TAG, "onComplete");
+                    }
+                });
+
+    }
+
     @Override
-    public void loadPlayInfo(int id, int type) {
+    public void loadPlayInfo(final int id, final int type) {
         mRecommend1Apis.getPlayMoreInfo(id, type)
                 .subscribeOn(Schedulers.io())
                 .map(new Function<TTDataResponse<PlayMoreInfoBean>, Items>() {
@@ -92,9 +173,35 @@ public class Play1Presenter extends AbsBasePresenter<Play1Contract.View> impleme
                     @Override
                     public void onNext(@NonNull Items items) {
                         //让view播放影片
-                        Log.e("cyh444", "playUrl = " + playUrl);
                         mView.showPlay(playUrl, playTitle);
                         mView.onDataUpdated(items);
+
+                        try {
+                            PlayInfoBean.PlayBean playBean = (PlayInfoBean.PlayBean) items.get(0);
+                            //将播放信息放入数据库
+                            PastBean pastBean = new PastBean();
+                            pastBean.setId(playBean.getId() + "");
+                            pastBean.setActors(playBean.getActors());
+                            pastBean.setCurrent_num(playBean.getCurrent_num());
+                            pastBean.setDescribes(playBean.getDescribes());
+                            pastBean.setDirctors(playBean.getDirctors());
+                            pastBean.setH_img(playBean.getH_img());
+                            pastBean.setV_img(playBean.getV_img());
+                            pastBean.setLinkurl(playBean.getLinkurl());
+                            pastBean.setScore(playBean.getScore());
+                            pastBean.setType(playBean.getType());
+                            pastBean.setTimes(playBean.getTimes());
+                            pastBean.setYears(playBean.getYears());
+                            pastBean.setSummary(playBean.getSummary());
+                            pastBean.setStyle_name(playBean.getStyle_name());
+                            pastBean.setTitle(playBean.getTitle());
+                            pastBean.setTotal(playBean.getTotal());
+                            pastBean.setInsertTime(System.currentTimeMillis());
+                            RealmHelper.getInstance().insertPlayInfo(pastBean);
+                        } catch (Exception ex) {
+                            Log.e("cyh777", "a lou = " + ex);
+                        }
+
                     }
 
                     @Override
@@ -107,6 +214,9 @@ public class Play1Presenter extends AbsBasePresenter<Play1Contract.View> impleme
                     @Override
                     public void onComplete() {
                         Log.d(TAG, "onComplete");
+                        if (SpUtils.getBoolean(App.getInstance(), "isLogin", false)) {
+                            isLove(id, type);
+                        }
                     }
                 });
     }

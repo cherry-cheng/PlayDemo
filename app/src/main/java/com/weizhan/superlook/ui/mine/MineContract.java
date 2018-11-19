@@ -2,6 +2,7 @@ package com.weizhan.superlook.ui.mine;
 
 import com.common.base.BasePresenter;
 import com.common.base.BaseView;
+import com.weizhan.superlook.model.bean.mine.UpdateBean;
 
 import me.drakeet.multitype.Items;
 
@@ -16,6 +17,8 @@ public interface MineContract {
         void onDataUpdated();
 
         void showLoadFailed();
+
+        void updateInfo(UpdateBean updateBean);
     }
 
     interface Presenter extends BasePresenter {

@@ -138,7 +138,6 @@ public class Recommend1Fragment extends BaseMvpFragment<Recommend1Presenter> imp
 
     @Override
     public void onDataRangeUpdate(Items items, int positionStart, int itemCount) {
-        Log.e("cyh555", "items = " + items.get(6).getClass());
         mAdapter.setItems(items);
         mAdapter.notifyItemRangeChanged(positionStart, itemCount, "abc");
     }

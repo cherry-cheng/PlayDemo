@@ -8,10 +8,7 @@ import android.os.Environment;
 import com.weizhan.superlook.App;
 
 import java.io.File;
-
-/**
- * Created by liujun26 on 2017/5/26.
- */
+import java.util.Date;
 
 public class AppUtils {
     public static boolean isExternalStorageAllowed = true;
@@ -66,8 +63,27 @@ public class AppUtils {
             return version;
         } catch (Exception e) {
             e.printStackTrace();
-            return "1.0";
+            return "1.0.0";
         }
+    }
+
+    public static int format(long timeStamp) {
+        long curTimeMillis = System.currentTimeMillis();
+        Date curDate = new Date(curTimeMillis);
+        int todayHoursSeconds = curDate.getHours() * 60 * 60;
+        int todayMinutesSeconds = curDate.getMinutes() * 60;
+        int todaySeconds = curDate.getSeconds();
+        int todayMillis = (todayHoursSeconds + todayMinutesSeconds + todaySeconds) * 1000;
+        long todayStartMillis = curTimeMillis - todayMillis;
+        if(timeStamp >= todayStartMillis) {
+            return 1; //今天
+        }
+        int oneDayMillis = 24 * 60 * 60 * 1000;
+        long yesterdayStartMilis = todayStartMillis - oneDayMillis;
+        if(timeStamp >= yesterdayStartMilis) {
+            return 0; //昨天
+        }
+        return -1; //更早
     }
 
 }

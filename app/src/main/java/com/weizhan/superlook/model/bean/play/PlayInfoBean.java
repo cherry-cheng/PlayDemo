@@ -2,6 +2,9 @@ package com.weizhan.superlook.model.bean.play;
 
 import java.util.List;
 
+import io.realm.RealmObject;
+import io.realm.annotations.PrimaryKey;
+
 /**
  * Created by Administrator on 2018/11/9.
  */
@@ -42,6 +45,15 @@ public class PlayInfoBean {
         String times;
         String style_name;
         String years;
+        int type;
+
+        public int getType() {
+            return type;
+        }
+
+        public void setType(int type) {
+            this.type = type;
+        }
 
         public String getTimes() {
             return times;

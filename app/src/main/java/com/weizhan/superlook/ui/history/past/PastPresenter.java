@@ -3,22 +3,14 @@ package com.weizhan.superlook.ui.history.past;
 import android.util.Log;
 
 import com.common.base.AbsBasePresenter;
-import com.common.util.DateUtil;
-import com.weizhan.superlook.model.api.ApiHelper;
 import com.weizhan.superlook.model.api.Recommend1Apis;
-import com.weizhan.superlook.model.bean.DataListResponse;
-import com.weizhan.superlook.model.bean.recommend1.AppRecommend1Show;
-
+import com.weizhan.superlook.model.bean.past.PastBean;
+import com.weizhan.superlook.model.bean.recommend1.RecommendBean;
+import com.weizhan.superlook.util.AppUtils;
+import com.weizhan.superlook.util.RealmHelper;
+import java.util.ArrayList;
 import java.util.List;
-
 import javax.inject.Inject;
-
-import io.reactivex.Observer;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.annotations.NonNull;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Function;
-import io.reactivex.schedulers.Schedulers;
 import me.drakeet.multitype.Items;
 
 /**
@@ -39,66 +31,55 @@ public class PastPresenter extends AbsBasePresenter<PastContract.View> {
     @Override
     public void loadData() {
         Items items = new Items();
-//        items.add(new SeriesHeaderItemViewBinder.Recommend1Header());
+        //从数据库中获取数据
+        items = regionShow2Items(RealmHelper.getInstance().getPlayInfoAll());
         mView.onDataUpdated(items);
-        mRecommend1Apis.getRecommend1Show(
-                ApiHelper.APP_KEY,
-                ApiHelper.BUILD,
-                ApiHelper.MOBI_APP,
-                ApiHelper.PLATFORM,
-                DateUtil.getSystemTime())
-                .subscribeOn(Schedulers.newThread())
-                .map(new Function<DataListResponse<AppRecommend1Show>, Items>() {
-                    @Override
-                    public Items apply(@NonNull DataListResponse<AppRecommend1Show> regionShow) throws Exception {
-                        return regionShow2Items(regionShow);
-                    }
-                })
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Observer<Items>() {
-                    @Override
-                    public void onSubscribe(@NonNull Disposable d) {
-                        registerRx(d);
-                    }
-
-                    @Override
-                    public void onNext(@NonNull Items items) {
-                        mView.onDataUpdated(items);
-                    }
-
-                    @Override
-                    public void onError(@NonNull Throwable e) {
-                        Log.e(TAG, "onError");
-                        e.printStackTrace();
-                        mView.showLoadFailed();
-                    }
-
-                    @Override
-                    public void onComplete() {
-                        Log.d(TAG, "onComplete");
-
-                    }
-                });
     }
 
-    private Items regionShow2Items(DataListResponse<AppRecommend1Show> regionShow) {
+    private Items regionShow2Items(List<PastBean> pastBeans) {
         Items items = new Items();
-//        items.add(new SeriesHeaderItemViewBinder.Recommend1Header());
-        List<AppRecommend1Show> regionShowList = regionShow.getData();
-        AppRecommend1Show.Partition partition = new AppRecommend1Show().new Partition();
-        partition.setTitle("今天");
-        int uu = 1;
-        for (AppRecommend1Show appRecommend1Show : regionShowList) {
-            //body
-            List<AppRecommend1Show.Body> bodyList = appRecommend1Show.getBody();
-            for (AppRecommend1Show.Body b : bodyList) {
-                items.add(partition);
-                items.add(b);
-                items.add(b);
-                items.add(b);
+        List<PastBean> pastTodays = new ArrayList<PastBean>();
+        List<PastBean> pastYesTodays = new ArrayList<PastBean>();
+        List<PastBean> pastOldDays = new ArrayList<PastBean>();
+        Log.e("cyh777", "pastBean = " + pastBeans.size() + "content = " + pastBeans.get(0).getTitle());
+        for (PastBean pastBean : pastBeans) {
+            int process = AppUtils.format(pastBean.getInsertTime());
+            if (process == 1) {
+                pastTodays.add(pastBean);
+            } else if (process == 0) {
+                pastYesTodays.add(pastBean);
+            } else {
+                pastOldDays.add(pastBean);
             }
-            break;
         }
+
+        if (pastTodays.size() > 0) {
+            RecommendBean.PartTitle partTitle = new RecommendBean().new PartTitle();
+            partTitle.setTitle("今天");
+            items.add(partTitle);
+            for (PastBean pastBean : pastTodays) {
+                items.add(pastBean);
+            }
+        }
+
+        if (pastYesTodays.size() > 0) {
+            RecommendBean.PartTitle partTitle = new RecommendBean().new PartTitle();
+            partTitle.setTitle("昨天");
+            items.add(partTitle);
+            for (PastBean pastBean : pastYesTodays) {
+                items.add(pastBean);
+            }
+        }
+
+        if (pastOldDays.size() > 0) {
+            RecommendBean.PartTitle partTitle = new RecommendBean().new PartTitle();
+            partTitle.setTitle("更早");
+            items.add(partTitle);
+            for (PastBean pastBean : pastOldDays) {
+                items.add(pastBean);
+            }
+        }
+
         return items;
     }
 

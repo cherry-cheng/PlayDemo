@@ -3,6 +3,8 @@ import android.util.Log;
 import com.common.base.AbsBasePresenter;
 import com.weizhan.superlook.model.api.SeriesApis;
 import com.weizhan.superlook.model.bean.SeriesDataResponse;
+import com.weizhan.superlook.model.bean.TTDataResponse;
+import com.weizhan.superlook.model.bean.recommend1.ChangeBean;
 import com.weizhan.superlook.model.bean.recommend1.RecommendBean;
 import com.weizhan.superlook.model.bean.series.SeriesBean;
 import com.weizhan.superlook.ui.series.viewbinder.SeriesFooterItemViewBinder;
@@ -27,6 +29,7 @@ public class SeriesPresenter extends AbsBasePresenter<SeriesContract.View> {
 
     private SeriesApis mSeriesApis;
 
+    Items items = new Items();
     @Inject
     public SeriesPresenter(SeriesApis regionApis) {
         mSeriesApis = regionApis;
@@ -34,7 +37,6 @@ public class SeriesPresenter extends AbsBasePresenter<SeriesContract.View> {
 
     @Override
     public void loadData() {
-        Items items = new Items();
         mView.onDataUpdated(items);
         mSeriesApis.getSeries("1")
                 .subscribeOn(Schedulers.newThread())
@@ -53,8 +55,9 @@ public class SeriesPresenter extends AbsBasePresenter<SeriesContract.View> {
                     }
 
                     @Override
-                    public void onNext(@NonNull Items items) {
-                        mView.onDataUpdated(items);
+                    public void onNext(@NonNull Items items1) {
+                        items = items1;
+                        mView.onDataUpdated(items1);
                     }
 
                     @Override
@@ -74,9 +77,9 @@ public class SeriesPresenter extends AbsBasePresenter<SeriesContract.View> {
 
     private Items seriesBean2Items(List<SeriesBean> seriesBeans) {
         Items items = new Items();
-
+        int number = 0;
         for (SeriesBean seriesBean : seriesBeans) {
-
+            number ++;
             RecommendBean.PartTitle partTitle = new RecommendBean().new PartTitle();
             partTitle.setTitle(seriesBean.getHome_name());
             items.add(partTitle);
@@ -89,32 +92,66 @@ public class SeriesPresenter extends AbsBasePresenter<SeriesContract.View> {
 
             SeriesFooterItemViewBinder.SeriesFooter footer = new SeriesFooterItemViewBinder.SeriesFooter();
             footer.setSeries("查看更多");
+            footer.setId(seriesBean.getId());
+            footer.setType(seriesBean.getType());
+            footer.setPlace(seriesBean.getPlace());
+            footer.setStyle_name(seriesBean.getStyle_name());
+            footer.setLast_page(seriesBean.getLast_page());
             items.add(footer);
 
         }
+        return items;
+    }
 
-/*        List<RecommendBean.ComlumInfo> comlumInfos = recommendBean.getComlum_list();
 
-        for (RecommendBean.ComlumInfo comlunItem : comlumInfos) {
+    public void refreshRange(int id, int type, int page, final int position, String style_name, String place) {
+        Log.e("cyh556", "refreshRange = " + id + " " + page + " " + style_name + " " + place + " " + type);
 
-            RecommendBean.PartTitle partTitle = new RecommendBean().new PartTitle();
-            partTitle.setTitle(comlunItem.getHome_name());
-            items.add(partTitle);
+        mSeriesApis.getChangeInfo(id, page, style_name, place, type)
+                .subscribeOn(Schedulers.newThread())
+                .map(new Function<TTDataResponse<ChangeBean>, Items>() {
+                    @Override
+                    public Items apply(@NonNull TTDataResponse<ChangeBean> changeBean) throws Exception {
+                        Log.i("cyh556", "请求走到了。。。。" + changeBean.getMsg());
+                        return changeBean2Items(changeBean.getBody(), position);
+                    }
+                })
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<Items>() {
+                    @Override
+                    public void onSubscribe(@NonNull Disposable d) {
+                        registerRx(d);
+                        Log.i("cyh556", "请求走到了。。。。");
+                    }
 
-            List<RecommendBean.ComlumInfo.ItemInfo> itemInfos = comlunItem.getList();
+                    @Override
+                    public void onNext(@NonNull Items items1) {
+//                        mView.onDataUpdated(items1);
+                        mView.onDataRangeUpdate(items, position - 6, 6);
+                    }
 
-            // 如果是电影 type = 1
-            if (comlunItem.getType() == 2) {
-                for (RecommendBean.ComlumInfo.ItemInfo itemInfo : itemInfos) {
-                    items.add(itemInfo);
-                }
-            }
+                    @Override
+                    public void onError(@NonNull Throwable e) {
+                        Log.e("cyh556", "onError = " + e);
+                        e.printStackTrace();
+                    }
 
-            Recommend1FooterItemViewBinder.Recommend1Footer footer = new Recommend1FooterItemViewBinder.Recommend1Footer();
-            footer.setRecommend1("查看更多");
-            items.add(footer);
+                    @Override
+                    public void onComplete() {
+                        Log.d("cyh556", "onComplete");
+                    }
+                });
+    }
 
-        }*/
+
+    private Items changeBean2Items(ChangeBean changeBean, int position) {
+        /*List<RecommendBean.ComlumInfo.ItemInfo> changeList = changeBean.getData();
+        int startP = position - 6;
+        int endP = position - 1;
+        for (int i = startP; i <= endP ; i ++) {
+            items.set(i, changeList.get(i-startP));
+        }
+        return items;*/
         return items;
     }
 

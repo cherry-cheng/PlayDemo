@@ -48,7 +48,7 @@ public class AllSearchPresenter extends AbsBasePresenter<AllSearchContract.View>
 
     }
 
-    public void onDataSearch(int type, String keywords) {
+    public void onDataSearch(String type, String keywords) {
         mRecommend1Apis.getSearchResult(type, keywords)
                 .subscribeOn(Schedulers.newThread())
                 .map(new Function<SeriesDataResponse<SeriesBean.EpisodeSearch>, Items>() {
@@ -66,7 +66,11 @@ public class AllSearchPresenter extends AbsBasePresenter<AllSearchContract.View>
 
                     @Override
                     public void onNext(@NonNull Items items) {
-                        mView.onDataUpdated(items);
+                        if (items.size() > 0) {
+                            mView.onDataUpdated(items);
+                        } else {
+                            mView.showLoadFailed();
+                        }
                     }
 
                     @Override

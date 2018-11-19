@@ -11,8 +11,17 @@ public class SeriesBean {
     String home_name;
     String style_name;
     String place;
-    String type;
+    int last_page;
+    int type;
     List<Episode> list;
+
+    public int getLast_page() {
+        return last_page;
+    }
+
+    public void setLast_page(int last_page) {
+        this.last_page = last_page;
+    }
 
     public int getId() {
         return id;
@@ -30,7 +39,7 @@ public class SeriesBean {
         return place;
     }
 
-    public String getType() {
+    public int getType() {
         return type;
     }
 
@@ -54,7 +63,7 @@ public class SeriesBean {
         this.place = place;
     }
 
-    public void setType(String type) {
+    public void setType(int type) {
         this.type = type;
     }
 

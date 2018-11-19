@@ -1,14 +1,10 @@
 package com.weizhan.superlook.model.api;
 
-import com.weizhan.superlook.model.bean.DataListResponse;
 import com.weizhan.superlook.model.bean.SeriesDataResponse;
 import com.weizhan.superlook.model.bean.TTDataResponse;
+import com.weizhan.superlook.model.bean.mine.UpdateBean;
 import com.weizhan.superlook.model.bean.mine.UserBean;
-import com.weizhan.superlook.model.bean.region.AppRegion;
-import com.weizhan.superlook.model.bean.region.AppRegionShow;
-import com.weizhan.superlook.model.bean.region.CateInfoBean;
 import com.weizhan.superlook.model.bean.region.RegionBean;
-
 import io.reactivex.Observable;
 import okhttp3.RequestBody;
 import retrofit2.http.Body;
@@ -24,21 +20,15 @@ public interface RegionApis {
 
     String HOST = "http://vweizhan.test.opencodes.top:9007";
 
-    /**
-     * 获取分区列表
-     * http://app.bilibili.com/x/v2/show/index?appkey=1d8b6e7d45233436&build=502000&mobi_app=android&platform=android&ts=1493711039000&sign=01cfab07e67d3520363d82636296dc8b
-     */
-    @GET("/x/v2/show/index")
-    Observable<DataListResponse<AppRegionShow>> getRegionShow(@Query("appkey") String appkey,
-                                                              @Query("build") String build,
-                                                              @Query("mobi_app") String mobi_app,
-                                                              @Query("platform") String platform,
-                                                              @Query("ts") String ts
-    );
-
     @POST("/api/usrlogin")
     Observable<TTDataResponse<UserBean>> getUserInfo(@Body RequestBody requestBody);
 
     @GET("/api/getcategory")
     Observable<SeriesDataResponse<RegionBean>> getCateInfo();
+
+    @POST("/api/needmovie")
+    Observable<TTDataResponse<UserBean>> postNeedMovie(@Body RequestBody requestBody);
+
+    @GET("/api/getappinfo")
+    Observable<TTDataResponse<UpdateBean>> getUpdateInfo(@Query("channel") String channel);
 }

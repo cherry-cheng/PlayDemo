@@ -19,12 +19,16 @@ import com.umeng.socialize.bean.SHARE_MEDIA;
 import com.weizhan.superlook.App;
 import com.weizhan.superlook.R;
 import com.weizhan.superlook.model.bean.mine.PostUserBean;
+import com.weizhan.superlook.model.bean.mine.UpdateBean;
 import com.weizhan.superlook.model.event.RefreshEvent;
 import com.weizhan.superlook.ui.mine.login.Defaultcontent;
 import com.weizhan.superlook.ui.mine.login.ShareUtils;
 import com.weizhan.superlook.ui.search.need.NeedMovieActivity;
+import com.weizhan.superlook.util.AppUtils;
+import com.weizhan.superlook.util.Constants;
 import com.weizhan.superlook.util.FileUtils;
 import com.weizhan.superlook.util.ImageUtil;
+import com.weizhan.superlook.util.ShareUtil;
 import com.weizhan.superlook.util.SpUtils;
 import com.weizhan.superlook.widget.dialog.SharePopWindow;
 import com.weizhan.superlook.widget.dialog.UpdateDialog;
@@ -39,6 +43,7 @@ import butterknife.BindView;
 import butterknife.OnClick;
 import de.hdodenhof.circleimageview.CircleImageView;
 import me.drakeet.multitype.Items;
+import me.shenfan.updateapp.UpdateService;
 
 public class MineFragment extends BaseMvpFragment<MinePresenter> implements MineContract.View {
 
@@ -126,37 +131,19 @@ public class MineFragment extends BaseMvpFragment<MinePresenter> implements Mine
             sharePopWindow.backgroundAlpha(getActivity(), 1f);
             switch (view.getId()) {
                 case R.id.weixinf:
-                    weiXin(view);
+                    ShareUtil.weiXin(view, getActivity());
                     break;
                 case R.id.wechatc:
-                    weixinCircle(view);
+                    ShareUtil.weixinCircle(view, getActivity());
                     break;
                 case R.id.sina:
-                    sina(view);
+                    ShareUtil.sina(view, getActivity());
                     break;
                 default:
                     break;
             }
         }
     };
-
-    public void weiXin(View view) {
-        ShareUtils.shareWeb(getActivity(), Defaultcontent.url, Defaultcontent.title
-                , Defaultcontent.text, Defaultcontent.imageurl, R.mipmap.icon, SHARE_MEDIA.WEIXIN
-        );
-    }
-
-    public void weixinCircle(View view) {
-        ShareUtils.shareWeb(getActivity(), Defaultcontent.url, Defaultcontent.title
-                , Defaultcontent.text, Defaultcontent.imageurl, R.mipmap.icon, SHARE_MEDIA.WEIXIN_CIRCLE
-        );
-    }
-
-    public void sina(View view) {
-        ShareUtils.shareWeb(getActivity(), Defaultcontent.url, Defaultcontent.title
-                , Defaultcontent.text, Defaultcontent.imageurl, R.mipmap.icon, SHARE_MEDIA.SINA
-        );
-    }
 
     @OnClick(R.id.tv_clean)
     void cleanCache() {
@@ -173,22 +160,9 @@ public class MineFragment extends BaseMvpFragment<MinePresenter> implements Mine
 
     @OnClick(R.id.tv_update)
     void updateCheck() {
-        //检查更新
-        final UpdateDialog updateDialog = new UpdateDialog(getActivity(), "发现新版本",
-                "现在更新", getResources().getString(R.string.update_content), true);
-        updateDialog.show();
-        updateDialog.setClickListener(new UpdateDialog.ClickListenerInterface() {
-            @Override
-            public void doConfirm() {
-                updateDialog.dismiss();
-                ToastUtils.showLongToast("正在下载");
-            }
-
-            @Override
-            public void doCancel() {
-                updateDialog.dismiss();
-            }
-        });
+        //调用更新接口
+        String channelName = "hw"; //动态获取渠道名称
+        mPresenter.getUpdateInfo(channelName);
     }
 
     @OnClick(R.id.tv_loggout)
@@ -199,6 +173,8 @@ public class MineFragment extends BaseMvpFragment<MinePresenter> implements Mine
         tv_loggout.setVisibility(View.GONE);
         view6.setVisibility(View.GONE);
         SpUtils.putBoolean(getContext(), "isLogin", false);
+        SpUtils.putString(getContext(), "uid", "1");
+        Constants.UID = "1";
         ToastUtils.showLongToast("已退出");
     }
 
@@ -304,6 +280,39 @@ public class MineFragment extends BaseMvpFragment<MinePresenter> implements Mine
     @Override
     public void showLoadFailed() {
         ToastUtils.showLongToast("服务器出小差了");
+    }
+
+    @Override
+    public void updateInfo(final UpdateBean updateBean) {
+        boolean isForce;
+        if (updateBean.getIssuper() == 1) {
+            isForce = true;
+        } else {
+            isForce = false;
+        }
+        String appver = AppUtils.getVersion(getContext());
+        Log.e("cyh777", "appver = " + appver + "updatever = " + updateBean.getAppversion());
+        if ((updateBean.getAppversion().compareTo(appver)) > 0) {
+            //检查更新
+            final UpdateDialog updateDialog = new UpdateDialog(getActivity(), "发现新版本",
+                    "现在更新", updateBean.getUpdate_log(), isForce);
+            updateDialog.show();
+            updateDialog.setClickListener(new UpdateDialog.ClickListenerInterface() {
+                @Override
+                public void doConfirm() {
+                    updateDialog.dismiss();
+                    ToastUtils.showLongToast("正在下载");
+                    UpdateService.Builder.create(updateBean.getLinkurl()).build(getActivity());
+                }
+
+                @Override
+                public void doCancel() {
+                    updateDialog.dismiss();
+                }
+            });
+        } else {
+            ToastUtils.showLongToast("当前已是最新版本");
+        }
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

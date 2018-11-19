@@ -15,8 +15,10 @@ import com.common.base.IBaseMvpActivity;
 import com.common.util.ToastUtils;
 import com.weizhan.superlook.App;
 import com.weizhan.superlook.R;
+import com.weizhan.superlook.model.bean.mine.NeedMoviePost;
 import com.weizhan.superlook.model.event.ClickMessage;
 import com.weizhan.superlook.ui.main.MainActivity;
+import com.weizhan.superlook.util.SpUtils;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -45,13 +47,14 @@ public class NeedMovieActivity extends BaseActivity implements IBaseMvpActivity<
 
     @OnClick(R.id.upload_bt)
     void goHome() {
-        //上传信息,如果上传成功给toast
-        if (getIntent().getBooleanExtra("isMine", false)) {
-            finish();
+        NeedMoviePost needMoviePost = new NeedMoviePost();
+        needMoviePost.setName(et_name.getText().toString());
+        if (SpUtils.getBoolean(this, "isLogin", false)) {
+            needMoviePost.setUid(SpUtils.getString(this, "uid", "1"));
         } else {
-            startActivity(new Intent(this, MainActivity.class));
+            needMoviePost.setUid("1");
         }
-        ToastUtils.showLongToast("提交成功，我们尽快搜找片源");
+        mPresenter.RequestMovie(needMoviePost);
     }
 
     @Override
@@ -121,5 +124,21 @@ public class NeedMovieActivity extends BaseActivity implements IBaseMvpActivity<
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(ClickMessage clickMessage) {
 
+    }
+
+    @Override
+    public void onSuccess() {
+        //上传信息,如果上传成功给toast
+        if (getIntent().getBooleanExtra("isMine", false)) {
+            finish();
+        } else {
+            startActivity(new Intent(this, MainActivity.class));
+        }
+        ToastUtils.showLongToast("提交成功，我们尽快搜找片源");
+    }
+
+    @Override
+    public void onFail() {
+        ToastUtils.showLongToast("服务器错误，请稍后再试");
     }
 }

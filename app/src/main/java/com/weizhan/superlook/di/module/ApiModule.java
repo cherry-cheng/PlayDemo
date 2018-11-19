@@ -2,15 +2,12 @@ package com.weizhan.superlook.di.module;
 
 import com.weizhan.superlook.di.scope.GlobalApis;
 import com.weizhan.superlook.model.api.ApiHelper;
-import com.weizhan.superlook.model.api.AppApis;
-import com.weizhan.superlook.model.api.BangumiApis;
 import com.weizhan.superlook.model.api.MovieApis;
 import com.weizhan.superlook.model.api.Recommend1Apis;
 import com.weizhan.superlook.model.api.RegionApis;
 import com.weizhan.superlook.model.api.SeriesApis;
 import com.weizhan.superlook.model.api.VarietyApis;
-import com.weizhan.superlook.model.api.WeChatApis;
-import com.weizhan.superlook.model.api.ZhihuApis;
+import com.weizhan.superlook.util.Constants;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
@@ -34,18 +31,6 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 @Module
 public class ApiModule {
-
-    @GlobalApis
-    @Provides
-    AppApis provideAppService(@Named("AppApi") Retrofit retrofit) {
-        return retrofit.create(AppApis.class);
-    }
-
-    @GlobalApis
-    @Provides
-    BangumiApis provideBangumiService(@Named("BangumiApi") Retrofit retrofit) {
-        return retrofit.create(BangumiApis.class);
-    }
 
     @GlobalApis
     @Provides
@@ -75,33 +60,6 @@ public class ApiModule {
     @Provides
     MovieApis provideMovieService(@Named("MovieApi") Retrofit retrofit) {
         return retrofit.create(MovieApis.class);
-    }
-
-    //Test Api
-    @GlobalApis
-    @Provides
-    ZhihuApis provideZhihuService(@Named("ZhihuApi") Retrofit retrofit) {
-        return retrofit.create(ZhihuApis.class);
-    }
-
-    @GlobalApis
-    @Provides
-    WeChatApis provideWeChatService(@Named("WeChatApi") Retrofit retrofit) {
-        return retrofit.create(WeChatApis.class);
-    }
-
-    @GlobalApis
-    @Provides
-    @Named("AppApi")
-    Retrofit provideAppRetrofit(Retrofit.Builder builder, OkHttpClient client) {
-        return createRetrofit(builder, client, AppApis.HOST);
-    }
-
-    @GlobalApis
-    @Provides
-    @Named("BangumiApi")
-    Retrofit provideBangumiRetrofit(Retrofit.Builder builder, OkHttpClient client) {
-        return createRetrofit(builder, client, BangumiApis.HOST);
     }
 
     @GlobalApis
@@ -137,21 +95,6 @@ public class ApiModule {
     @Named("MovieApi")
     Retrofit provideMovieRetrofit(Retrofit.Builder builder, OkHttpClient client) {
         return createRetrofit(builder, client, MovieApis.HOST);
-    }
-
-    //Test Api
-    @GlobalApis
-    @Provides
-    @Named("ZhihuApi")
-    Retrofit provideZhihuRetrofit(Retrofit.Builder builder, OkHttpClient client) {
-        return createRetrofit(builder, client, ZhihuApis.HOST);
-    }
-
-    @GlobalApis
-    @Provides
-    @Named("WeChatApi")
-    Retrofit provideWechatRetrofit(Retrofit.Builder builder, OkHttpClient client) {
-        return createRetrofit(builder, client, WeChatApis.HOST);
     }
 
     private Retrofit createRetrofit(Retrofit.Builder builder, OkHttpClient okHttpClient, String url) {
@@ -191,6 +134,7 @@ public class ApiModule {
                 Request newRequest = oldRequest.newBuilder()
                         .method(oldRequest.method(), oldRequest.body())
                         .url(newBuilder.build())
+                        .addHeader("uid", Constants.UID)
                         .build();
                 return chain.proceed(newRequest);
             }

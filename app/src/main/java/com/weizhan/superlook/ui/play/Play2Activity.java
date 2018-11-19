@@ -5,6 +5,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -12,17 +13,23 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import com.common.base.BaseActivity;
 import com.common.base.IBaseMvpActivity;
+import com.common.util.ToastUtils;
 import com.dueeeke.videocontroller.StandardVideoController;
 import com.dueeeke.videoplayer.player.IjkVideoView;
 import com.dueeeke.videoplayer.player.PlayerConfig;
+import com.umeng.socialize.UMShareAPI;
 import com.weizhan.superlook.App;
 import com.weizhan.superlook.R;
 import com.weizhan.superlook.model.bean.play.PlayInfoBean;
 import com.weizhan.superlook.model.bean.play.TestBean;
 import com.weizhan.superlook.model.bean.play.TestSeriesBean;
 import com.weizhan.superlook.model.event.PartNumBean;
+import com.weizhan.superlook.model.event.Play;
 import com.weizhan.superlook.model.event.PlayPost;
+import com.weizhan.superlook.util.ShareUtil;
+import com.weizhan.superlook.util.SpUtils;
 import com.weizhan.superlook.widget.adapter.CommonAdapter;
+import com.weizhan.superlook.widget.dialog.SharePopWindow;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -39,7 +46,7 @@ import me.drakeet.multitype.Items;
 public class Play2Activity extends BaseActivity implements IBaseMvpActivity<Play2Presenter>, Play2Contract.View {
 
     private IjkVideoView ijkVideoView;
-
+    private SharePopWindow sharePopWindow;
     @Inject
     Play2Presenter mPresenter;
     @BindView(R.id.guessLike_recyclerView)
@@ -47,6 +54,8 @@ public class Play2Activity extends BaseActivity implements IBaseMvpActivity<Play
 
     private CommonAdapter mAdapter;
     private static final int SPAN_COUNT = 2;
+
+    PlayTitleItemViewBinder playTitleItemViewBinder;
 
     @Override
     protected void onPause() {
@@ -89,61 +98,6 @@ public class Play2Activity extends BaseActivity implements IBaseMvpActivity<Play
 
     @Override
     public void initViewAndEvent() {
-/*        ijkVideoView = findViewById(R.id.player);
-
-        Intent intent = getIntent();
-
-        if (intent != null) {
-            StandardVideoController controller = new StandardVideoController(this);
-            ijkVideoView.setPlayerConfig(new PlayerConfig.Builder()
-                    .autoRotate()//自动旋转屏幕
-//                    .enableCache()//启用边播边存
-//                    .enableMediaCodec()//启动硬解码
-//                    .usingSurfaceView()//使用SurfaceView
-//                    .setCustomMediaPlayer(new ExoMediaPlayer(this))
-//                    .setCustomMediaPlayer(new AndroidMediaPlayer(this))
-                    .build());
-//            ijkVideoView.setScreenScale(IjkVideoView.SCREEN_SCALE_CENTER_CROP);
-            ijkVideoView.setUrl(intent.getStringExtra("url"));
-            ijkVideoView.setVideoController(controller);
-            ijkVideoView.start();
-        }
-
-
-        GridLayoutManager layoutManager = new GridLayoutManager(this, SPAN_COUNT);
-        GridLayoutManager.SpanSizeLookup spanSizeLookup = new GridLayoutManager.SpanSizeLookup() {
-            @Override
-            public int getSpanSize(int position) {
-                Object item = mAdapter.getItems().get(position);
-                return item instanceof AppRecommend1Show.Body ? 1 : SPAN_COUNT;
-            }
-        };
-        layoutManager.setSpanSizeLookup(spanSizeLookup);
-        guessLike_recyclerView.setLayoutManager(layoutManager);
-        guessLike_recyclerView.addItemDecoration(new GuessLike1ItemDecoration());
-        guessLike_recyclerView.setBackgroundColor(ContextCompat.getColor(this, R.color.white));
-        mAdapter = new CommonAdapter(0, 99);
-        mAdapter.register(PlayInfoBean.PlayRecommendBean.class, new GueLikeBodyItemViewBinder());
-        PlayTitleItemViewBinder playTitleItemViewBinder = new PlayTitleItemViewBinder();
-        playTitleItemViewBinder.setClickListenr(new PlayTitleItemViewBinder.tvClick() {
-            @Override
-            public void ontvClick(ImageView imageView, LinearLayout linearLayout) {
-                if (imageView.isSelected()) {
-                    imageView.setSelected(false);
-                    linearLayout.setVisibility(View.GONE);
-                } else {
-                    imageView.setSelected(true);
-                    linearLayout.setVisibility(View.VISIBLE);
-                    guessLike_recyclerView.scrollToPosition(0);
-                }
-            }
-        });
-//        mAdapter.register(AppRecommend1Show.Partition.class, playTitleItemViewBinder);
-        mAdapter.register(TestBean.class, new GuessTitleViewBinder());
-        mAdapter.register(TestChooseBean.class, new ChooseVarietyItemViewBinder());
-        mAdapter.setScrollSaveStrategyEnabled(true);
-        guessLike_recyclerView.setAdapter(mAdapter);*/
-
         ijkVideoView = findViewById(R.id.player);
         Intent intent = getIntent();
         int id = intent.getIntExtra("id", 0);
@@ -162,7 +116,7 @@ public class Play2Activity extends BaseActivity implements IBaseMvpActivity<Play
         guessLike_recyclerView.addItemDecoration(new GuessLike1ItemDecoration());
         guessLike_recyclerView.setBackgroundColor(ContextCompat.getColor(this, R.color.white));
         mAdapter = new CommonAdapter(0, 99);
-        PlayTitleItemViewBinder playTitleItemViewBinder = new PlayTitleItemViewBinder();
+        playTitleItemViewBinder = new PlayTitleItemViewBinder();
         playTitleItemViewBinder.setClickListenr(new PlayTitleItemViewBinder.tvClick() {
             @Override
             public void ontvClick(ImageView imageView, LinearLayout linearLayout) {
@@ -174,6 +128,23 @@ public class Play2Activity extends BaseActivity implements IBaseMvpActivity<Play
                     linearLayout.setVisibility(View.VISIBLE);
                     guessLike_recyclerView.scrollToPosition(0);
                 }
+            }
+
+            @Override
+            public void onUserLoveClick(ImageView imageView, int id, int type, int isLove) {
+                if (SpUtils.getBoolean(Play2Activity.this, "isLogin", false)) {
+                    mPresenter.lovesMovie(id, type, isLove);
+                } else {
+                    ToastUtils.showLongToast("请先登录");
+                }
+            }
+
+            @Override
+            public void onUserShareClick(ImageView imageView) {
+                //分享应用
+                sharePopWindow = new SharePopWindow(Play2Activity.this, itemsOnClick);
+                sharePopWindow.setAnimationStyle(R.style.PopupWindow);
+                sharePopWindow.showAtLocation(imageView, Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL, 0, 0);
             }
         });
         mAdapter.register(PlayInfoBean.PlayBean.class, playTitleItemViewBinder);
@@ -232,7 +203,31 @@ public class Play2Activity extends BaseActivity implements IBaseMvpActivity<Play
         ijkVideoView.setTitle(title);
         ijkVideoView.setVideoController(controller);
         ijkVideoView.start();
+        Log.e("cyh777", "play------2-----");
+        EventBus.getDefault().post(new Play());
     }
+
+
+    private View.OnClickListener itemsOnClick = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            sharePopWindow.dismiss();
+            sharePopWindow.backgroundAlpha(Play2Activity.this, 1f);
+            switch (view.getId()) {
+                case R.id.weixinf:
+                    ShareUtil.weiXin(view, Play2Activity.this);
+                    break;
+                case R.id.wechatc:
+                    ShareUtil.weixinCircle(view, Play2Activity.this);
+                    break;
+                case R.id.sina:
+                    ShareUtil.sina(view, Play2Activity.this);
+                    break;
+                default:
+                    break;
+            }
+        }
+    };
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onPlayRefresh(PlayPost playPost) {
@@ -246,5 +241,46 @@ public class Play2Activity extends BaseActivity implements IBaseMvpActivity<Play
         if (partNumBean != null) {
             showPlay(partNumBean.getUrl(), partNumBean.getTitle());
         }
+    }
+
+    @Override
+    public void updateIsLove(int isLove) {
+        //将是否收藏的按键改变状态
+        ImageView imageView = playTitleItemViewBinder.getImageView();
+        if (isLove == 0) {
+            //未登录
+            imageView.setSelected(false);
+        } else if (isLove == 1) {
+            //收藏
+            imageView.setSelected(true);
+        } else {
+            //未收藏
+            imageView.setSelected(false);
+        }
+    }
+
+    @Override
+    public void loveMovies(int love) {
+        ImageView imageView = playTitleItemViewBinder.getImageView();
+        boolean isLove = imageView.isSelected();
+        if (love == 0) {
+            //未登录
+        } else if (love == 1) {
+            //成功
+            if (isLove) {
+                imageView.setSelected(false);
+            } else {
+                imageView.setSelected(true);
+            }
+        } else {
+            //失败
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        UMShareAPI.get(Play2Activity.this).onActivityResult(requestCode, resultCode, data);
+        Log.i("cyh333", "有回调妈？？？？？？？？");
     }
 }

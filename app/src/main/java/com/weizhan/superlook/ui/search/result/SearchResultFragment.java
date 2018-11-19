@@ -1,9 +1,11 @@
 package com.weizhan.superlook.ui.search.result;
 
+import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 
 import com.androidkun.xtablayout.XTabLayout;
 import com.common.base.BaseFragment;
@@ -15,8 +17,6 @@ import com.weizhan.superlook.ui.search.result.all.AllSearchFragment;
 import com.weizhan.superlook.ui.search.result.movie.MovieSFragment;
 import com.weizhan.superlook.ui.search.result.series.SeriesSFragment;
 import com.weizhan.superlook.ui.search.result.variety.VarietySFragment;
-import com.weizhan.superlook.ui.test.fragment.PlaceHolderFragment;
-
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
@@ -91,6 +91,14 @@ public class SearchResultFragment extends BaseFragment {
     }
 
     private void initChildFragment() {
+        Bundle bundle = this.getArguments();
+        String keyword = bundle.getString("search");
+        Log.i("cyh555", "bundle = " + keyword);
+        allSearchFragment.setArguments(bundle);
+        movieSFragment.setArguments(bundle);
+        seriesSFragment.setArguments(bundle);
+        varietySFragment.setArguments(bundle);
+
         mFragments.add(allSearchFragment);
         mFragments.add(movieSFragment);
         mFragments.add(seriesSFragment);

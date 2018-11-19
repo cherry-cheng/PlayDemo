@@ -16,6 +16,8 @@ public interface PlayContract {
         void showLoadFailed();
 
         void showPlay(String url, String title);
+        void updateIsLove(int isLove);
+        void loveMovies(int love);
     }
 
     interface Presenter extends BasePresenter {

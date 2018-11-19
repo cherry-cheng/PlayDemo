@@ -9,4 +9,5 @@ public class Constants {
     public static String type_1 = "电影";
     public static String type_2 = "电视剧";
     public static String type_3 = "综艺";
+    public static String UID = "1";
 }

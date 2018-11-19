@@ -11,6 +11,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import com.weizhan.superlook.R;
 import com.weizhan.superlook.model.bean.play.PlayInfoBean;
+import com.weizhan.superlook.util.SpUtils;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import me.drakeet.multitype.ItemViewBinder;
@@ -24,6 +25,16 @@ public class PlayTitleItemViewBinder extends ItemViewBinder<PlayInfoBean.PlayBea
 
     private tvClick clickListenr;
 
+    private ImageView imageView;
+
+    public ImageView getImageView() {
+        return imageView;
+    }
+
+    public void setImageView(ImageView imageView) {
+        this.imageView = imageView;
+    }
+
     public void setClickListenr(tvClick listenr) {
         clickListenr = listenr;
     }
@@ -36,7 +47,7 @@ public class PlayTitleItemViewBinder extends ItemViewBinder<PlayInfoBean.PlayBea
     }
 
     @Override
-    protected void onBindViewHolder(@NonNull final PlayTitleItemViewBinder.PlayTitleViewHolder holder, @NonNull PlayInfoBean.PlayBean item) {
+    protected void onBindViewHolder(@NonNull final PlayTitleItemViewBinder.PlayTitleViewHolder holder, @NonNull final PlayInfoBean.PlayBean item) {
         final Context context = holder.iv_displayIntro.getContext();
         holder.title.setText(item.getTitle());
         holder.tv_score.setText(item.getScore());
@@ -47,15 +58,31 @@ public class PlayTitleItemViewBinder extends ItemViewBinder<PlayInfoBean.PlayBea
         holder.iv_displayIntro.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-/*                if (holder.iv_displayIntro.isSelected()) {
-                    holder.iv_displayIntro.setSelected(false);
-                    holder.ll_display.setVisibility(View.GONE);
-                } else {
-                    holder.iv_displayIntro.setSelected(true);
-                    holder.ll_display.setVisibility(View.VISIBLE);
-                }*/
                 clickListenr.ontvClick(holder.iv_displayIntro, holder.ll_display);
+            }
+        });
 
+        holder.like_iv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //调用搜藏接口
+                int isLove = 1;
+                if (holder.like_iv.isSelected()) {
+                    isLove = 2;
+                } else {
+                    isLove = 1;
+                }
+                clickListenr.onUserLoveClick(holder.like_iv, item.getId(), item.getType(), isLove);
+            }
+        });
+
+        this.imageView = holder.like_iv;
+
+        holder.share_iv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //分享应用
+                clickListenr.onUserShareClick(holder.share_iv);
             }
         });
     }
@@ -78,6 +105,10 @@ public class PlayTitleItemViewBinder extends ItemViewBinder<PlayInfoBean.PlayBea
         TextView tv_actor;
         @BindView(R.id.des_tv)
         TextView des_tv;
+        @BindView(R.id.like_iv)
+        ImageView like_iv;
+        @BindView(R.id.share_iv)
+        ImageView share_iv;
         public PlayTitleViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
@@ -86,5 +117,7 @@ public class PlayTitleItemViewBinder extends ItemViewBinder<PlayInfoBean.PlayBea
 
     public interface tvClick {
         void ontvClick(ImageView imageView, LinearLayout linearLayout);
+        void onUserLoveClick(ImageView imageView, int id, int type, int isLove);
+        void onUserShareClick(ImageView imageView);
     }
 }

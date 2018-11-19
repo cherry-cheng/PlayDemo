@@ -17,7 +17,6 @@ import com.weizhan.superlook.ui.history.MainHistoryFragment;
 import com.weizhan.superlook.ui.mine.MineFragment;
 import com.weizhan.superlook.ui.region.RegionFragment;
 import com.weizhan.superlook.util.BottomNavigationViewHelper;
-import com.weizhan.superlook.ui.test.fragment.PlaceHolderFragment;
 import com.common.base.IBaseMvpActivity;
 import com.common.base.BaseActivity;
 

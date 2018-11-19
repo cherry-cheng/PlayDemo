@@ -1,18 +1,11 @@
 package com.weizhan.superlook.ui.history.collect;
-
 import android.util.Log;
-
 import com.common.base.AbsBasePresenter;
-import com.common.util.DateUtil;
-import com.weizhan.superlook.model.api.ApiHelper;
 import com.weizhan.superlook.model.api.Recommend1Apis;
-import com.weizhan.superlook.model.bean.DataListResponse;
-import com.weizhan.superlook.model.bean.recommend1.AppRecommend1Show;
-
+import com.weizhan.superlook.model.bean.SeriesDataResponse;
+import com.weizhan.superlook.model.bean.series.SeriesBean;
 import java.util.List;
-
 import javax.inject.Inject;
-
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.annotations.NonNull;
@@ -20,7 +13,6 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 import me.drakeet.multitype.Items;
-
 /**
  * Created by Administrator on 2018/9/5.
  */
@@ -39,19 +31,13 @@ public class CollectPresenter extends AbsBasePresenter<CollectContract.View> {
     @Override
     public void loadData() {
         Items items = new Items();
-//        items.add(new SeriesHeaderItemViewBinder.Recommend1Header());
         mView.onDataUpdated(items);
-        mRecommend1Apis.getRecommend1Show(
-                ApiHelper.APP_KEY,
-                ApiHelper.BUILD,
-                ApiHelper.MOBI_APP,
-                ApiHelper.PLATFORM,
-                DateUtil.getSystemTime())
+        mRecommend1Apis.getUserLoveList()
                 .subscribeOn(Schedulers.newThread())
-                .map(new Function<DataListResponse<AppRecommend1Show>, Items>() {
+                .map(new Function<SeriesDataResponse<SeriesBean.EpisodeSearch>, Items>() {
                     @Override
-                    public Items apply(@NonNull DataListResponse<AppRecommend1Show> regionShow) throws Exception {
-                        return regionShow2Items(regionShow);
+                    public Items apply(@NonNull SeriesDataResponse<SeriesBean.EpisodeSearch> regionShow) throws Exception {
+                        return regionShow2Items(regionShow.getBody());
                     }
                 })
                 .observeOn(AndroidSchedulers.mainThread())
@@ -63,7 +49,11 @@ public class CollectPresenter extends AbsBasePresenter<CollectContract.View> {
 
                     @Override
                     public void onNext(@NonNull Items items) {
-                        mView.onDataUpdated(items);
+                        if (items.size() > 0) {
+                            mView.onDataUpdated(items);
+                        } else {
+                            mView.showLoadFailed();
+                        }
                     }
 
                     @Override
@@ -76,23 +66,14 @@ public class CollectPresenter extends AbsBasePresenter<CollectContract.View> {
                     @Override
                     public void onComplete() {
                         Log.d(TAG, "onComplete");
-
                     }
                 });
     }
 
-    private Items regionShow2Items(DataListResponse<AppRecommend1Show> regionShow) {
+    private Items regionShow2Items(List<SeriesBean.EpisodeSearch> episodes) {
         Items items = new Items();
-//        items.add(new SeriesHeaderItemViewBinder.Recommend1Header());
-        List<AppRecommend1Show> regionShowList = regionShow.getData();
-        int uu = 1;
-        for (AppRecommend1Show appRecommend1Show : regionShowList) {
-            //body
-            List<AppRecommend1Show.Body> bodyList = appRecommend1Show.getBody();
-            for (AppRecommend1Show.Body b : bodyList) {
-                items.add(b);
-            }
-            break;
+        for (SeriesBean.EpisodeSearch episode : episodes) {
+            items.add(episode);
         }
         return items;
     }

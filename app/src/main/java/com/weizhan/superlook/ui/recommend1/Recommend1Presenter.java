@@ -38,7 +38,6 @@ public class Recommend1Presenter extends AbsBasePresenter<Recommend1Contract.Vie
 
     @Override
     public void loadData() {
-//        items.add(new SeriesHeaderItemViewBinder.Recommend1Header());
         mView.onDataUpdated(items);
         mRecommend1Apis.getRecommend("0")
                 .subscribeOn(Schedulers.newThread())
@@ -151,7 +150,6 @@ public class Recommend1Presenter extends AbsBasePresenter<Recommend1Contract.Vie
                     movieItem.setCurrent_num(itemInfo.getCurrent_num());
                     movieItem.setH_img(itemInfo.getH_img());
                     movieItem.setId(itemInfo.getId());
-                    movieItem.setLinkurl(itemInfo.getLinkurl());
                     movieItem.setScore(itemInfo.getScore());
                     movieItem.setDescribes(itemInfo.getDescribes());
                     movieItem.setTitle(itemInfo.getTitle());

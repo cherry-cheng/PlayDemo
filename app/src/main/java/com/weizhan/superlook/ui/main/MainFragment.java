@@ -6,34 +6,24 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-
 import com.androidkun.xtablayout.XTabLayout;
 import com.common.base.BaseMvpFragment;
 import com.weizhan.superlook.App;
 import com.weizhan.superlook.R;
 import com.weizhan.superlook.model.event.TabSelectedEvent;
-import com.weizhan.superlook.ui.bangumi.BangumiFragment;
 import com.weizhan.superlook.ui.movie.MovieFragment;
 import com.weizhan.superlook.ui.recommend1.Recommend1Fragment;
-import com.weizhan.superlook.ui.region.RegionContract;
-import com.weizhan.superlook.ui.region.RegionPresenter;
 import com.weizhan.superlook.ui.search.SearchActivity;
 import com.weizhan.superlook.ui.series.SeriesFragment;
-import com.common.base.BaseFragment;
 import com.weizhan.superlook.ui.variety.VarietyFragment;
-
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.inject.Inject;
-
 import butterknife.BindView;
 import butterknife.OnClick;
-import me.drakeet.multitype.Items;
 
 /**
  * 首页主Fragment
@@ -53,8 +43,6 @@ public class MainFragment extends BaseMvpFragment<HomePresenter> implements Home
 
     @Inject
     Recommend1Fragment mRecommend1Fragment;
-    @Inject
-    BangumiFragment mBangumiFragment;
     @Inject
     SeriesFragment mSeriesFragment;
     @Inject

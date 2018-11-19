@@ -2,6 +2,7 @@ package com.weizhan.superlook.model.api;
 
 import com.weizhan.superlook.model.bean.SeriesDataResponse;
 import com.weizhan.superlook.model.bean.TTDataResponse;
+import com.weizhan.superlook.model.bean.recommend1.ChangeBean;
 import com.weizhan.superlook.model.bean.region.CateInfoBean;
 import com.weizhan.superlook.model.bean.series.SeriesBean;
 import io.reactivex.Observable;
@@ -23,4 +24,11 @@ public interface SeriesApis {
 
     @POST("/api/getlist")
     Observable<TTDataResponse<CateInfoBean>> getMoreCateInfo(@Body RequestBody requestBody);
+
+    @GET("/api/listchange")
+    Observable<TTDataResponse<ChangeBean>> getChangeInfo(@Query("id") int id,
+                                                         @Query("page") int page,
+                                                         @Query("style_name") String style_name,
+                                                         @Query("place") String place,
+                                                         @Query("type") int type);
 }

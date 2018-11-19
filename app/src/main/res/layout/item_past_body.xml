@@ -4,6 +4,7 @@
     android:layout_marginBottom="8dp"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/white"
+    android:id="@+id/rl_item"
     android:layout_height="wrap_content">
 
     <RelativeLayout
@@ -78,6 +79,7 @@
         android:text="电影 | 内地"
         android:layout_marginLeft="8dp"
         android:layout_marginTop="2dp"
+        android:visibility="gone"
         android:textColor="#ff9b9b9b"
         android:textSize="10sp"
         android:layout_width="wrap_content"
@@ -90,6 +92,7 @@
         android:layout_marginLeft="8dp"
         android:gravity="center"
         android:text="新"
+        android:visibility="gone"
         android:textColor="@color/white"
         android:textSize="7dp"
         android:background="@drawable/bg_theme"

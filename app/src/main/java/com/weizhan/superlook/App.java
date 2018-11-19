@@ -19,7 +19,9 @@ import com.weizhan.superlook.di.module.ApiModule;
 import com.weizhan.superlook.di.module.FragmentModule;
 import com.weizhan.superlook.model.bean.recommend1.KeyWordBean;
 import com.weizhan.superlook.model.bean.recommend1.RecommendBean;
+import com.weizhan.superlook.util.Constants;
 import com.weizhan.superlook.util.RealmHelper;
+import com.weizhan.superlook.util.SpUtils;
 import com.weizhan.superlook.widget.CustomBitmapMemoryCacheParamsSupplier;
 import com.common.app.ActivityLifecycleManager;
 import com.common.app.AppComponent;
@@ -75,6 +77,7 @@ public class App extends Application {
     public void onCreate() {
         super.onCreate();
         sInstance = this;
+        Constants.UID = SpUtils.getString(this, "uid", "1");
         registerActivityLifecycleCallbacks(new ActivityLifecycleManager());
         Fragmentation.builder()
                 // 设置 栈视图 模式为 悬浮球模式   SHAKE: 摇一摇唤出   NONE：隐藏

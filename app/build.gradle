@@ -29,6 +29,10 @@ android {
     packagingOptions {
         exclude 'META-INF/LICENSE.txt'
     }
+
+    dexOptions {
+        jumboMode true
+    }
 }
 
 dependencies {
@@ -64,4 +68,7 @@ dependencies {
     implementation files('libs/umeng_social_net.jar')
     implementation files('libs/umeng_social_shareview.jar')
     implementation files('libs/umeng_social_tool.jar')
+
+    compile "com.github.bumptech.glide:glide:3.7.0"
+    compile project(':app-update')
 }

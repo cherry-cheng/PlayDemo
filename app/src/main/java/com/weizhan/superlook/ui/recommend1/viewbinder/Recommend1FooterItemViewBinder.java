@@ -61,7 +61,6 @@ public class Recommend1FooterItemViewBinder extends ItemViewBinder<Recommend1Foo
             @Override
             public void onClick(View view) {
                 //数据局部刷新
-                ToastUtils.showLongToast("局部刷新test");
                 RangeRefresh rangeRefresh = new RangeRefresh();
                 rangeRefresh.setId(item.getId());
                 rangeRefresh.setType(item.getType());

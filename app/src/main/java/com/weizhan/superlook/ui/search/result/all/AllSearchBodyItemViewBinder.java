@@ -1,6 +1,7 @@
 package com.weizhan.superlook.ui.search.result.all;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -11,6 +12,9 @@ import android.widget.TextView;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.weizhan.superlook.R;
 import com.weizhan.superlook.model.bean.series.SeriesBean;
+import com.weizhan.superlook.ui.play.Play1Activity;
+import com.weizhan.superlook.ui.play.Play2Activity;
+import com.weizhan.superlook.ui.play.PlayerActivity;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -31,18 +35,18 @@ public class AllSearchBodyItemViewBinder extends ItemViewBinder<SeriesBean.Episo
 
     @Override
     protected void onBindViewHolder(@NonNull AllSearchBodyItemViewBinder.Recommend1BodyViewHolder holder, @NonNull final SeriesBean.EpisodeSearch item) {
-        Context context = holder.ivCover.getContext();
+        final Context context = holder.ivCover.getContext();
         String type = "电影";
         if (item.getType() == 1) {
             holder.ivCover.setImageURI(item.getH_img());
             holder.update_tv.setText("");
             type = "电影";
         } else {
-            if (item.getType() == 2) {
+            if (item.getType() == 3) {
                 holder.update_tv.setText(item.getTimes() + "期");
-                type = "电视剧";
-            } else {
                 type = "综艺";
+            } else {
+                type = "电视剧";
                 if (item.getCurrent_num() >= item.getTotal()) {
                     holder.update_tv.setText("完结");
                 } else {
@@ -61,11 +65,20 @@ public class AllSearchBodyItemViewBinder extends ItemViewBinder<SeriesBean.Episo
             public void onClick(View view) {
                 int type = item.getType();
                 if (type == 1) {
-
+                    Intent intent = new Intent(context, PlayerActivity.class);
+                    intent.putExtra("id", item.getId());
+                    intent.putExtra("type", item.getType());
+                    context.startActivity(intent);
                 } else if (type == 2) {
-
+                    Intent intent = new Intent(context, Play1Activity.class);
+                    intent.putExtra("id", item.getId());
+                    intent.putExtra("type", item.getType());
+                    context.startActivity(intent);
                 } else if (type == 3) {
-
+                    Intent intent = new Intent(context, Play2Activity.class);
+                    intent.putExtra("id", item.getId());
+                    intent.putExtra("type", item.getType());
+                    context.startActivity(intent);
                 }
             }
         });

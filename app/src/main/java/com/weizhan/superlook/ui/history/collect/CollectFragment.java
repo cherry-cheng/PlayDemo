@@ -7,7 +7,8 @@ import android.support.v7.widget.RecyclerView;
 import com.common.base.BaseMvpFragment;
 import com.weizhan.superlook.App;
 import com.weizhan.superlook.R;
-import com.weizhan.superlook.model.bean.recommend1.AppRecommend1Show;
+import com.weizhan.superlook.model.bean.series.SeriesBean;
+import com.weizhan.superlook.ui.search.result.all.AllSearchBodyItemViewBinder;
 import com.weizhan.superlook.widget.adapter.CommonAdapter;
 import com.weizhan.superlook.widget.adapter.binder.SearchNormalFailedBinder;
 
@@ -46,7 +47,7 @@ public class CollectFragment extends BaseMvpFragment<CollectPresenter> implement
         mRecyclerView.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.white));
         mAdapter = new CommonAdapter(1, 99);
         mAdapter.setLoadFailedBinder(new SearchNormalFailedBinder(R.mipmap.img_video_placeholder, R.string.history_cFail));
-        mAdapter.register(AppRecommend1Show.Body.class, new CollectBodyItemViewBinder());
+        mAdapter.register(SeriesBean.EpisodeSearch.class, new AllSearchBodyItemViewBinder());
         mAdapter.setScrollSaveStrategyEnabled(true);
         mRecyclerView.setAdapter(mAdapter);
     }

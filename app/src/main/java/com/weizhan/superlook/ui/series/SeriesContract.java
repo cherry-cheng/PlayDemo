@@ -15,6 +15,8 @@ public class SeriesContract {
         void onDataUpdated(Items items);
 
         void showLoadFailed();
+
+        void onDataRangeUpdate(Items items, int positionStart, int itemCount);
     }
 
     interface Presenter extends BasePresenter {

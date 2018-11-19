@@ -57,7 +57,6 @@ public class SearchFailedBinder extends BaseLoadFailedBinder<SearchFailedBinder.
         holder.request_tv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ToastUtils.showLongToast("点击了我要求片");
                 EventBus.getDefault().post(new JumpActivity());
             }
         });

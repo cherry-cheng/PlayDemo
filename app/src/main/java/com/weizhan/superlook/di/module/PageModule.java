@@ -2,7 +2,6 @@ package com.weizhan.superlook.di.module;
 
 import com.weizhan.superlook.di.scope.PerActivity;
 import com.weizhan.superlook.di.scope.PerFragment;
-import com.weizhan.superlook.ui.bangumi.BangumiFragment;
 import com.weizhan.superlook.ui.history.MainHistoryFragment;
 import com.weizhan.superlook.ui.history.collect.CollectFragment;
 import com.weizhan.superlook.ui.history.off.OffFragment;
@@ -19,7 +18,6 @@ import com.weizhan.superlook.ui.search.result.movie.MovieSFragment;
 import com.weizhan.superlook.ui.search.result.series.SeriesSFragment;
 import com.weizhan.superlook.ui.search.result.variety.VarietySFragment;
 import com.weizhan.superlook.ui.series.SeriesFragment;
-import com.weizhan.superlook.ui.test.fragment.NewsFragment;
 import com.weizhan.superlook.ui.variety.VarietyFragment;
 
 import dagger.Module;
@@ -31,13 +29,6 @@ import dagger.Provides;
 
 @Module
 public class PageModule {
-
-    //Test
-    @Provides
-    @PerActivity
-    NewsFragment provideNewsFragment(){
-        return new NewsFragment();
-    }
 
     //main
     @Provides
@@ -58,12 +49,6 @@ public class PageModule {
     @PerActivity
     SearchResultFragment provideSearchResultFragment() {
         return new SearchResultFragment();
-    }
-
-    @Provides
-    @PerFragment
-    BangumiFragment provideBangumiFragment() {
-        return new BangumiFragment();
     }
 
     @Provides

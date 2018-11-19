@@ -44,12 +44,20 @@ public class RecommendBean {
         int id;
         String v_img;
         String h_img;
-        String linkurl;
         String score;
         String describes;
         int total;
         int type;
+        String times;
         int current_num;
+
+        public String getTimes() {
+            return times;
+        }
+
+        public void setTimes(String times) {
+            this.times = times;
+        }
 
         public String getTitle() {
             return title;
@@ -65,10 +73,6 @@ public class RecommendBean {
 
         public String getH_img() {
             return h_img;
-        }
-
-        public String getLinkurl() {
-            return linkurl;
         }
 
         public String getScore() {
@@ -97,10 +101,6 @@ public class RecommendBean {
 
         public void setH_img(String h_img) {
             this.h_img = h_img;
-        }
-
-        public void setLinkurl(String linkurl) {
-            this.linkurl = linkurl;
         }
 
         public void setScore(String score) {
@@ -235,7 +235,6 @@ public class RecommendBean {
             int id;
             String v_img;
             String h_img;
-            String linkurl;
             String score;
             String describes;
             int total;
@@ -257,10 +256,6 @@ public class RecommendBean {
 
             public String getH_img() {
                 return h_img;
-            }
-
-            public String getLinkurl() {
-                return linkurl;
             }
 
             public String getScore() {
@@ -289,10 +284,6 @@ public class RecommendBean {
 
             public void setH_img(String h_img) {
                 this.h_img = h_img;
-            }
-
-            public void setLinkurl(String linkurl) {
-                this.linkurl = linkurl;
             }
 
             public void setScore(String score) {

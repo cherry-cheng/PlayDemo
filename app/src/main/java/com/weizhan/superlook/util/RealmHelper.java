@@ -2,6 +2,7 @@ package com.weizhan.superlook.util;
 
 import android.util.Log;
 
+import com.weizhan.superlook.model.bean.past.PastBean;
 import com.weizhan.superlook.model.bean.search.SearchKey;
 
 import java.util.List;
@@ -106,6 +107,40 @@ public class RealmHelper implements DBHelper {
     public List<SearchKey> getSearchHistoryListAll() {
         //使用findAllSort ,先findAll再result.sort排序
         RealmResults<SearchKey> results = getRealm().where(SearchKey.class).findAllSorted("insertTime", Sort.DESCENDING);
+        return getRealm().copyFromRealm(results);
+    }
+
+    @Override
+    public void insertPlayInfo(PastBean playBean) {
+        //如果有不保存
+        List<PastBean> list = getPlayInfoHistoryList(playBean.getId());
+        if (list != null && list.size() > 0) {
+            deletePlayList(playBean.getId());
+        }
+        if (list == null || list.size() == 0) {
+            getRealm().beginTransaction();
+            getRealm().copyToRealm(playBean);
+            getRealm().commitTransaction();
+        }
+        Log.e("cyh777", "插入成功");
+    }
+
+    public void deletePlayList(String id) {
+        PastBean data = getRealm().where(PastBean.class).equalTo("id", id).findFirst();
+        getRealm().beginTransaction();
+        data.deleteFromRealm();
+        getRealm().commitTransaction();
+    }
+
+    @Override
+    public List<PastBean> getPlayInfoHistoryList(String id) {
+        RealmResults<PastBean> results = getRealm().where(PastBean.class).contains("id", id).findAllSorted("insertTime", Sort.DESCENDING);
+        return getRealm().copyFromRealm(results);
+    }
+
+    @Override
+    public List<PastBean> getPlayInfoAll() {
+        RealmResults<PastBean> results = getRealm().where(PastBean.class).findAllSorted("insertTime", Sort.DESCENDING);
         return getRealm().copyFromRealm(results);
     }
 }
